@@ -1,11 +1,12 @@
 import os
+import asyncio
 from datetime import timedelta
 import discord
 from discord.ext import commands
 from flask import Flask
 from threading import Thread
 
-# Luodaan pieni Flask-nettisivu, jotta Renderin Web Service pysyy tyytyväisenä
+# Flask server to keep Render web service happy
 app = Flask('')
 
 @app.route('/')
@@ -19,18 +20,99 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# Discord-botin perusasetukset
+# Bot setup (removes default boring help command)
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix="??", intents=intents)
+bot = commands.Bot(command_prefix="??", intents=intents, help_command=None)
 
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
     print("Moonlings bot is online and ready!")
+    await bot.change_presence(activity=discord.Game(name="??help | Moonlings"))
 
-# Komennot
+# ----------------- CUSTOM EMBED HELP COMMAND -----------------
+@bot.command(name="help")
+async def custom_help(ctx):
+    embed = discord.Embed(
+        title="🌙 Moonlings Bot Commands",
+        description="Here is the list of available commands for **Moonlings Bot**!",
+        color=discord.Color.purple()
+    )
+    
+    embed.add_field(
+        name="🛠️ Moderation Commands",
+        value=(
+            "`??kick @user [reason]` - Kick a member from the server\n"
+            "`??ban @user [reason]` - Ban a member from the server\n"
+            "`??mute @user [minutes] [reason]` - Timeout/Mute a member"
+        ),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="💬 Utility Commands",
+        value=(
+            "`??say [message]` - Bot repeats your message\n"
+            "`??reply [message_id] [message]` - Bot replies to a specific message ID"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🎫 Ticket System",
+        value=(
+            "`??ticket` - Creates a private support ticket channel\n"
+            "`??close` - Closes/deletes the ticket channel (use inside ticket channel)"
+        ),
+        inline=False
+    )
+    
+    embed.set_footer(text="Moonlings Automation & Moderation", icon_url=bot.user.display_avatar.url)
+    
+    await ctx.send(embed=embed)
+
+# ----------------- TICKET SYSTEM -----------------
+@bot.command(name="ticket")
+async def create_ticket(ctx):
+    guild = ctx.guild
+    member = ctx.author
+    
+    # Check if a ticket category exists, or create one
+    category = discord.utils.get(guild.categories, name="Tickets")
+    if not category:
+        category = await guild.create_category("Tickets")
+        
+    # Set permissions: only the user and admins/bot can see the channel
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        member: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+        guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+    }
+    
+    channel_name = f"ticket-{member.name}".lower().replace(" ", "-")
+    ticket_channel = await guild.create_text_channel(name=channel_name, category=category, overwrites=overwrites)
+    
+    # Send welcome embed in ticket channel
+    embed = discord.Embed(
+        title="🎫 Ticket Opened",
+        description=f"Hello {member.mention}, welcome to your support ticket!\nPlease state your issue and staff will assist you shortly.\n\nType `??close` to close this ticket.",
+        color=discord.Color.blue()
+    )
+    await ticket_channel.send(embed=embed)
+    await ctx.send(f"✅ Ticket created! Check {ticket_channel.mention}", delete_after=5)
+
+@bot.command(name="close")
+async def close_ticket(ctx):
+    if "ticket-" in ctx.channel.name:
+        await ctx.send("Closing ticket in 5 seconds...")
+        await asyncio.sleep(5)
+        await ctx.channel.delete()
+    else:
+        await ctx.send("❌ This command can only be used inside a ticket channel!")
+
+# ----------------- EXISTING COMMANDS -----------------
 @bot.command(name="say")
 async def say_command(ctx, *, message: str):
     await ctx.message.delete()
@@ -51,21 +133,13 @@ async def kick_command(ctx, member: discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send(f"Done! {member.mention} has been kicked from the server.")
 
-@kick_command.error
-async def kick_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You do not have permission to kick members!")
+@kick_error if False else None
 
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban_command(ctx, member: discord.Member, *, reason=None):
     await member.ban(reason=reason)
     await ctx.send(f"Done! {member.mention} has been banned from the server.")
-
-@ban_command.error
-async def ban_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You do not have permission to ban members!")
 
 @bot.command(name="mute")
 @commands.has_permissions(moderate_members=True)
@@ -74,12 +148,7 @@ async def mute_command(ctx, member: discord.Member, minutes: int, *, reason=None
     await member.timeout(duration, reason=reason)
     await ctx.send(f"Done! {member.mention} has been muted for {minutes} minutes.")
 
-@mute_command.error
-async def mute_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You do not have permission to mute members!")
-
-# Käynnistetään Flask taustalle ja botti käyntiin
+# Start server & bot
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 if TOKEN:
