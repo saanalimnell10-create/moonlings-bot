@@ -34,7 +34,6 @@ class HelpSelect(Select):
         super().__init__(placeholder="Select a help category...", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        # 1. Moderation Embed
         if self.values[0] == "moderation":
             embed = discord.Embed(
                 title="🛡️ Moderation & Security Commands",
@@ -51,7 +50,6 @@ class HelpSelect(Select):
             ), inline=False)
             await interaction.response.edit_message(embed=embed)
 
-        # 2. Tickets Embed
         elif self.values[0] == "tickets":
             embed = discord.Embed(
                 title="🎫 Ticket System Commands",
@@ -64,7 +62,6 @@ class HelpSelect(Select):
             ), inline=False)
             await interaction.response.edit_message(embed=embed)
 
-        # 3. Community & Games Embed
         elif self.values[0] == "community":
             embed = discord.Embed(
                 title="🎮 Community & Games",
@@ -79,7 +76,6 @@ class HelpSelect(Select):
             ), inline=False)
             await interaction.response.edit_message(embed=embed)
 
-        # 4. Utility Embed
         elif self.values[0] == "utility":
             embed = discord.Embed(
                 title="🛠️ Utility & Server Tools",
@@ -96,25 +92,28 @@ class HelpSelect(Select):
             ), inline=False)
             await interaction.response.edit_message(embed=embed)
 
-# --- VIEW CONTAINER ---
 class HelpView(View):
     def __init__(self):
-        super().__init__(timeout=180) # View expires after 3 minutes of inactivity
+        super().__init__(timeout=180)
         self.add_item(HelpSelect())
 
-# --- THE COG ---
 class HelpMenu(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="help")
-    async def help_command(ctx):
+    async def help_command(self, ctx):  # <--- TÄHÄN LISÄTTIIN 'self'!
         embed = discord.Embed(
             title="🌙 Moonlings Bot Help Menu",
             description="Welcome to **Moonlings Bot**! Please choose a category from the dropdown menu below to view its commands.",
             color=discord.Color.from_rgb(43, 45, 49)
         )
         embed.set_footer(text="Moonlings Automation & Moderation", icon_url=ctx.bot.user.display_avatar.url)
+        
+        await ctx.send(embed=embed, view=HelpView())
+
+async def setup(bot):
+    await bot.add_cog(HelpMenu(bot))
         
         await ctx.send(embed=embed, view=HelpView())
 
