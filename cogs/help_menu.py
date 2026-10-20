@@ -116,6 +116,5 @@ async def setup(bot):
     await bot.add_cog(HelpMenu(bot))
         
         await ctx.send(embed=embed, view=HelpView())
-
 async def setup(bot):
-    await bot.add_cog(HelpMenu(bot))
+        await bot.add_cog(HelpMenu(bot))
