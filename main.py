@@ -2,12 +2,27 @@ import os
 from datetime import timedelta
 import discord
 from discord.ext import commands
+from flask import Flask
+from threading import Thread
 
-# Set up bot intents
+# Luodaan pieni Flask-nettisivu, jotta Renderin Web Service pysyy tyytyväisenä
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is online!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# Discord-botin perusasetukset
 intents = discord.Intents.default()
 intents.message_content = True
 
-# Initialize bot with prefix '!'
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
@@ -15,13 +30,12 @@ async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
     print("Moonlings bot is online and ready!")
 
-# 1. SAY COMMAND - Bot repeats your message and deletes original
+# Komennot
 @bot.command(name="say")
 async def say_command(ctx, *, message: str):
     await ctx.message.delete()
     await ctx.send(message)
 
-# 2. REPLY COMMAND - Bot replies to a specific message ID
 @bot.command(name="reply")
 async def reply_command(ctx, message_id: int, *, message: str):
     try:
@@ -31,7 +45,6 @@ async def reply_command(ctx, message_id: int, *, message: str):
     except discord.NotFound:
         await ctx.send("Message not found! Please check the ID.", delete_after=5)
 
-# 3. KICK COMMAND
 @bot.command(name="kick")
 @commands.has_permissions(kick_members=True)
 async def kick_command(ctx, member: discord.Member, *, reason=None):
@@ -43,7 +56,6 @@ async def kick_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You do not have permission to kick members!")
 
-# 4. BAN COMMAND
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban_command(ctx, member: discord.Member, *, reason=None):
@@ -55,7 +67,6 @@ async def ban_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You do not have permission to ban members!")
 
-# 5. MUTE / TIMEOUT COMMAND
 @bot.command(name="mute")
 @commands.has_permissions(moderate_members=True)
 async def mute_command(ctx, member: discord.Member, minutes: int, *, reason=None):
@@ -68,10 +79,11 @@ async def mute_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You do not have permission to mute members!")
 
-# Get secret token from environment variables
+# Käynnistetään Flask taustalle ja botti käyntiin
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 if TOKEN:
+    keep_alive()
     bot.run(TOKEN)
 else:
-    print("Error: DISCORD_TOKEN not found! Please check environment variables.")
+    print("Error: DISCORD_TOKEN not found!")
