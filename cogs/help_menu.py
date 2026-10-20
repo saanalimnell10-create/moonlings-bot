@@ -7,88 +7,92 @@ class HelpSelect(Select):
         options = [
             discord.SelectOption(
                 label="Moderation & Security",
-                description="View ban, kick, mute, lock, and anti-nuke commands.",
-                emoji="🛡️",
+                description="Keep our cosmic ocean safe and cozy~ 🛡️",
+                emoji="🛸",
                 value="moderation"
             ),
             discord.SelectOption(
-                label="Tickets & Setup",
-                description="View ticket creation, setup, and close commands.",
-                emoji="🎫",
+                label="Tickets & Support",
+                description="Need help? Drop into a cozy starlight bubble 💌",
+                emoji="🫧",
                 value="tickets"
             ),
             discord.SelectOption(
                 label="Community & Games",
-                description="View counting, partnership, and Truth or Dare commands.",
-                emoji="🎮",
+                description="Counting, partnerships, & star-fishing! 🎮",
+                emoji="⭐",
                 value="community"
             ),
             discord.SelectOption(
                 label="Utility & Tools",
-                description="View stats, AFK, timezone, and clone tools.",
-                emoji="🛠️",
+                description="AFK bubbles, galaxy stats & moon tools ☁️",
+                emoji="🌙",
                 value="utility"
             ),
         ]
-        super().__init__(placeholder="Select a help category...", min_values=1, max_values=1, options=options)
+        super().__init__(placeholder="dive into the galaxy, cutie~ 🪐", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
         if self.values[0] == "moderation":
             embed = discord.Embed(
-                title="🛡️ Moderation & Security Commands",
-                description="Here are your moderation and security tools:",
-                color=discord.Color.red()
+                title="🛸 ∙ Cosmic Moderation & Security",
+                description="Gentle star-tools to keep our ocean peaceful and bright~ 🌊✨",
+                color=discord.Color.from_rgb(135, 206, 250) # Light Sky Blue
             )
             embed.add_field(name="Commands", value=(
-                "`??kick @user [reason]` - Kick a member\n"
-                "`??ban @user [reason]` - Ban a member\n"
-                "`??mute @user [minutes]` - Timeout a member\n"
-                "`??lock / ??unlock` - Lock or unlock channels\n"
-                "`??purge [amount]` - Mass delete messages\n"
-                "`??antinuke / ??antiraid` - Security toggles"
+                "`??kick @user [reason]` - Guide a troublemaker back to shore\n"
+                "`??ban @user [reason]` - Send a mischievous soul to deep space\n"
+                "`??mute @user [minutes]` - Give a quiet underwater timeout\n"
+                "`??lock / ??unlock` - Lock or unlock starry channels\n"
+                "`??purge [amount]` - Sweep away stardust and messy messages\n"
+                "`??antinuke / ??antiraid` - Shield our galaxy from meteors"
             ), inline=False)
+            embed.set_footer(text="Moonlings Space Protection 🌌", icon_url=interaction.client.user.display_avatar.url)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "tickets":
             embed = discord.Embed(
-                title="🎫 Ticket System Commands",
-                description="Manage your support and application tickets:",
-                color=discord.Color.blue()
+                title="🫧 ∙ Starlight Tickets & Support",
+                description="Floating in a sea of questions? Open a ticket in our cozy bubbles! 💌",
+                color=discord.Color.from_rgb(175, 238, 238) # Pale Turquoise
             )
             embed.add_field(name="Commands", value=(
-                "`??setup` - Send the interactive support ticket dropdown menu\n"
-                "`??close` - Close an active ticket and generate a transcript"
+                "`??setup` - Spawn the interactive ocean support menu\n"
+                "`??close` - Pop the ticket bubble and save a star-transcript"
             ), inline=False)
+            embed.set_footer(text="Moonlings Deep Sea Support 🌊", icon_url=interaction.client.user.display_avatar.url)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "community":
             embed = discord.Embed(
-                title="🎮 Community & Games",
-                description="Fun and interactive community features:",
-                color=discord.Color.green()
+                title="⭐ ∙ Galaxy Community & Games",
+                description="Let's swim together through constellations and fun! 🐳✨",
+                color=discord.Color.from_rgb(221, 160, 221) # Plum / Soft Purple
             )
             embed.add_field(name="Commands", value=(
-                "`??partner @user [details]` - Post a partnership announcement\n"
-                "`??setcounting` - Set up the chill counting channel\n"
-                "`??tod` - Play Truth or Dare with buttons\n"
-                "`??truth` / `??dare` - Random truth or dare questions"
+                "`??partner @user [details]` - Share a glowing constellation partnership\n"
+                "`??setcounting` - Swim along with our endless star-counting game\n"
+                "`??tod` - Play cosmic Truth or Dare with glowing buttons\n"
+                "`??truth` / `??dare` - Spin a random star question"
             ), inline=False)
+            embed.set_footer(text="Moonlings Starry Sea 🌟", icon_url=interaction.client.user.display_avatar.url)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "utility":
             embed = discord.Embed(
-                title="🛠️ Utility & Server Tools",
-                description="General server and personal tools:",
-                color=discord.Color.purple()
+                title="🌙 ∙ Moonlit Utility & Tools",
+                description="Little shooting stars and deep sea gadgets for your journey~ 🪐",
+                color=discord.Color.from_rgb(255, 182, 193) # Light Pink
             )
             embed.add_field(name="Commands", value=(
-                "`??afk [reason]` - Set AFK status & auto-nickname tag\n"
-                "`??top daily/weekly/all` - View chat leaderboards\n"
-                "`??vctop` - View voice channel activity\n"
-                "`??tz set [zone]` / `??tz @user` - Timezone tools\n"
-                "`??steal [emoji]` - Steal an emoji\n"
-                "`??clone` - Clone a channel"
+                "`??afk [reason]` - Float away to sleep with an [AFK] moon tag\n"
+                "`??top daily/weekly/all` - Check our glowing activity comets\n"
+                "`??vctop` - See who spends the most time in coral voice chats\n"
+                "`??tz set [zone]` / `??tz @user` - Check star-times across the world\n"
+                "`??steal [emoji]` - Catch a stray emoji from another nebula\n"
+                "`??clone` - Duplicate a cozy channel layout"
             ), inline=False)
+            embed.set_footer(text="Moonlings Cosmic Tools 🚀", icon_url=interaction.client.user.display_avatar.url)
             await interaction.response.edit_message(embed=embed)
 
 class HelpView(View):
@@ -103,13 +107,14 @@ class HelpMenu(commands.Cog):
     @commands.command(name="help")
     async def help_command(self, ctx):
         embed = discord.Embed(
-            title="🌙 Moonlings Bot Help Menu",
-            description="Welcome to **Moonlings Bot**! Please choose a category from the dropdown menu below to view its commands.",
-            color=discord.Color.from_rgb(43, 45, 49)
+            title="🪐 ∙ Moonlings Cosmic Help Menu",
+            description="Welcome to our dreamy space ocean! 🌊🌙 Please pick a constellation from the dropdown menu below to explore~ ✨",
+            color=discord.Color.from_rgb(176, 224, 230)
         )
-        embed.set_footer(text="Moonlings Automation & Moderation", icon_url=ctx.bot.user.display_avatar.url)
+        embed.set_footer(text="Floating through space & sea with Moonlings 🐳", icon_url=ctx.bot.user.display_avatar.url)
         
         await ctx.send(embed=embed, view=HelpView())
 
 async def setup(bot):
     await bot.add_cog(HelpMenu(bot))
+
