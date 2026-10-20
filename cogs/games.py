@@ -29,6 +29,7 @@ class Games(commands.Cog):
             "Send a GIF that represents your current mood today! 🫧"
         ]
 
+    # 1. TRUTH KOMENTO
     @commands.command(name="truth")
     async def truth_command(self, ctx):
         await ctx.message.delete()
@@ -42,6 +43,7 @@ class Games(commands.Cog):
         embed.set_footer(text="Moonlings Games ☁️", icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
+    # 2. DARE KOMENTO
     @commands.command(name="dare")
     async def dare_command(self, ctx):
         await ctx.message.delete()
@@ -52,6 +54,32 @@ class Games(commands.Cog):
             description=f"**{ctx.author.mention}**, here is your challenge:\n\n```{dare}```",
             color=discord.Color.from_rgb(175, 238, 238)
         )
+        embed.set_footer(text="Moonlings Games ☁️", icon_url=ctx.author.display_avatar.url)
+        await ctx.send(embed=embed)
+
+    # 3. TOD KOMENTO (Arpoo satunnaisesti kumman tahansa)
+    @commands.command(name="tod")
+    async def tod_command(self, ctx):
+        await ctx.message.delete()
+        
+        # Valitaan satunnaisesti truth tai dare
+        choice_type = random.choice(["truth", "dare"])
+
+        if choice_type == "truth":
+            question = random.choice(self.truths)
+            embed = discord.Embed(
+                title="🌸 ∙ TOD: Truth Chosen!",
+                description=f"**{ctx.author.mention}**, fate picked **Truth** for you:\n\n```{question}```",
+                color=discord.Color.from_rgb(255, 182, 193)
+            )
+        else:
+            dare = random.choice(self.dares)
+            embed = discord.Embed(
+                title="✨ ∙ TOD: Dare Chosen!",
+                description=f"**{ctx.author.mention}**, fate picked **Dare** for you:\n\n```{dare}```",
+                color=discord.Color.from_rgb(175, 238, 238)
+            )
+
         embed.set_footer(text="Moonlings Games ☁️", icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
