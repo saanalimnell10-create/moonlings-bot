@@ -20,7 +20,7 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# Bot setup (removes default boring help command)
+# Bot setup
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -79,12 +79,10 @@ async def create_ticket(ctx):
     guild = ctx.guild
     member = ctx.author
     
-    # Check if a ticket category exists, or create one
     category = discord.utils.get(guild.categories, name="Tickets")
     if not category:
         category = await guild.create_category("Tickets")
         
-    # Set permissions: only the user and admins/bot can see the channel
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(read_messages=False),
         member: discord.PermissionOverwrite(read_messages=True, send_messages=True),
@@ -94,7 +92,6 @@ async def create_ticket(ctx):
     channel_name = f"ticket-{member.name}".lower().replace(" ", "-")
     ticket_channel = await guild.create_text_channel(name=channel_name, category=category, overwrites=overwrites)
     
-    # Send welcome embed in ticket channel
     embed = discord.Embed(
         title="🎫 Ticket Opened",
         description=f"Hello {member.mention}, welcome to your support ticket!\nPlease state your issue and staff will assist you shortly.\n\nType `??close` to close this ticket.",
@@ -112,7 +109,7 @@ async def close_ticket(ctx):
     else:
         await ctx.send("❌ This command can only be used inside a ticket channel!")
 
-# ----------------- EXISTING COMMANDS -----------------
+# ----------------- OTHER COMMANDS -----------------
 @bot.command(name="say")
 async def say_command(ctx, *, message: str):
     await ctx.message.delete()
@@ -132,8 +129,6 @@ async def reply_command(ctx, message_id: int, *, message: str):
 async def kick_command(ctx, member: discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send(f"Done! {member.mention} has been kicked from the server.")
-
-@kick_error if False else None
 
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
