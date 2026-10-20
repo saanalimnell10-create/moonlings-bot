@@ -18,13 +18,13 @@ class AFK(commands.Cog):
             "pings": []
         }
 
-        # Vaihdetaan nimimerkkiin [AFK]-tagi (jos botilla on oikeudet)
+        # Yritetään vaihtaa nimimerkkiin [AFK]-tagi
         try:
             original_nick = user.nick or user.name
             if not original_nick.startswith("[AFK]"):
                 await user.edit(nick=f"[AFK] {original_nick}")
         except Exception:
-            pass # Jos botilla ei ole oikeuksia vaihtaa nimeä, jatketaan silti normaalisti
+            pass  # Jos botilla ei ole oikeuksia vaihtaa nimeä, jatketaan silti normaalisti
 
         embed = discord.Embed(
             title="💤 ∙ AFK Mode Activated",
@@ -66,7 +66,7 @@ class AFK(commands.Cog):
             )
 
             if pings_received:
-                ping_summary = "\n".join(pings_received[:10]) # Näytetään enintään 10 uusinta pingiä
+                ping_summary = "\n".join(pings_received[:10])
                 embed.add_field(name="📬 Pings while you were away:", value=f"```{ping_summary}```", inline=False)
             else:
                 embed.add_field(name="📬 Pings while you were away:", value="```No one pinged you! Such a peaceful nap~ ☁️```", inline=False)
@@ -80,7 +80,6 @@ class AFK(commands.Cog):
                 if mentioned_user.id in self.afk_users:
                     reason = self.afk_users[mentioned_user.id]["reason"]
                     
-                    # Tallennetaan ping muistiin
                     ping_msg = f"{message.author.display_name}: \"{message.content}\" (in #{message.channel.name})"
                     self.afk_users[mentioned_user.id]["pings"].append(ping_msg)
 
@@ -95,5 +94,4 @@ class AFK(commands.Cog):
                     await message.channel.send(embed=embed, delete_after=8)
 
 async def setup(bot):
-    async def setup(bot):
-        await bot.add_cog(AFK(bot))
+    await bot.add_cog(AFK(bot))
