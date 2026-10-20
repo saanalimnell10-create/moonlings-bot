@@ -74,7 +74,7 @@ class Moderation(commands.Cog):
         
         embed = discord.Embed(
             title="⚠️ ∙ Member Warned",
-            description=f"**{member.mention}** received a little gentle warning~ 🫧\nTotal active warnings: **{count}**",
+            description=f"**{member.mention}** received a gentle warning~ 🫧\nTotal active warnings: **{count}**",
             color=discord.Color.from_rgb(255, 218, 185)
         )
         embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
@@ -82,7 +82,32 @@ class Moderation(commands.Cog):
         
         await ctx.send(embed=embed)
 
-    # 5. WARNINGS COMMAND (Tarkista varoitukset)
+    # 5. UNWARN COMMAND (Poista varoitus)
+    @commands.command(name="unwarn")
+    @commands.has_permissions(moderate_members=True)
+    async def unwarn_command(self, ctx, member: discord.Member):
+        await ctx.message.delete()
+        
+        if member.id in self.warnings and len(self.warnings[member.id]) > 0:
+            self.warnings[member.id].pop()  # Poistaa viimeisimmän varoituksen
+            count = len(self.warnings[member.id])
+            
+            embed = discord.Embed(
+                title="✨ ∙ Warning Removed",
+                description=f"A warning was removed from **{member.mention}**~ 🌸\nRemaining active warnings: **{count}**",
+                color=discord.Color.from_rgb(152, 251, 152)
+            )
+        else:
+            embed = discord.Embed(
+                title="🌸 ∙ No Warnings Found",
+                description=f"**{member.mention}** doesn't have any active warnings to remove~ 🫧",
+                color=discord.Color.from_rgb(230, 230, 250)
+            )
+            
+        embed.set_footer(text=f"Action taken by {ctx.author.display_name} ✨", icon_url=ctx.author.display_avatar.url)
+        await ctx.send(embed=embed)
+
+    # 6. WARNINGS COMMAND (Tarkista varoitukset)
     @commands.command(name="warnings")
     async def warnings_command(self, ctx, member: discord.Member = None):
         await ctx.message.delete()
@@ -105,7 +130,7 @@ class Moderation(commands.Cog):
             
         await ctx.send(embed=embed)
 
-    # 6. WARN EXPIRY COMMAND (Aseta varoitusten vanhenemisaika)
+    # 7. WARN EXPIRY COMMAND
     @commands.command(name="warnexpiry")
     @commands.has_permissions(administrator=True)
     async def warn_expiry_command(self, ctx, option: str):
@@ -130,7 +155,7 @@ class Moderation(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    # 7. LOCK & HIDE CHANNEL
+    # 8. LOCK & HIDE CHANNEL
     @commands.command(name="lock")
     @commands.has_permissions(manage_channels=True)
     async def lock_command(self, ctx):
@@ -144,7 +169,7 @@ class Moderation(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    # 8. UNLOCK & UNHIDE CHANNEL
+    # 9. UNLOCK & UNHIDE CHANNEL
     @commands.command(name="unlock")
     @commands.has_permissions(manage_channels=True)
     async def unlock_command(self, ctx):
@@ -158,7 +183,7 @@ class Moderation(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    # 9. PURGE COMMAND
+    # 10. PURGE COMMAND
     @commands.command(name="purge")
     @commands.has_permissions(manage_messages=True)
     async def purge_command(self, ctx, amount: int):
