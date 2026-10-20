@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord.ui import Select, View
 
-# --- DROPDOWN SELECT MENU ---
 class HelpSelect(Select):
     def __init__(self):
         options = [
@@ -102,7 +101,7 @@ class HelpMenu(commands.Cog):
         self.bot = bot
 
     @commands.command(name="help")
-    async def help_command(self, ctx):  # <--- TÄHÄN LISÄTTIIN 'self'!
+    async def help_command(self, ctx):
         embed = discord.Embed(
             title="🌙 Moonlings Bot Help Menu",
             description="Welcome to **Moonlings Bot**! Please choose a category from the dropdown menu below to view its commands.",
@@ -114,7 +113,3 @@ class HelpMenu(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(HelpMenu(bot))
-        
-        await ctx.send(embed=embed, view=HelpView())
-async def setup(bot):
-        await bot.add_cog(HelpMenu(bot))
