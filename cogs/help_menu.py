@@ -8,13 +8,16 @@ class HelpDropdown(discord.ui.Select):
                 label="Moderation", description="Keep the server safe and cozy! 🛡️", emoji="🛡️", value="moderation"
             ),
             discord.SelectOption(
+                label="Channel Management", description="Lock, unlock and purge channels 🧹", emoji="🔒", value="channels"
+            ),
+            discord.SelectOption(
                 label="Tickets", description="Support and help ticket system 🎫", emoji="🎫", value="tickets"
             ),
             discord.SelectOption(
                 label="Community", description="Counting, stats, games and fun! 🌸", emoji="✨", value="community"
             ),
             discord.SelectOption(
-                label="Utility", description="AFK, reminders and helpful tools ☁️", emoji="🛠️", value="utility"
+                label="Utility", description="AFK, bump reminders and tools ☁️", emoji="🛠️", value="utility"
             )
         ]
         super().__init__(placeholder="Select a category to explore~ 🫧", min_values=1, max_values=1, options=options)
@@ -31,13 +34,20 @@ class HelpDropdown(discord.ui.Select):
             embed.add_field(name="`??kick`", value="Kicks a naughty member from the server.", inline=False)
             embed.add_field(name="`??ban`", value="Bans a user from the galaxy.", inline=False)
             embed.add_field(name="`??mute`", value="Timeouts a member to chill out.", inline=False)
-            embed.add_field(name="`??lock` / `??unlock`", value="Locks or unlocks a text channel.", inline=False)
-            embed.add_field(name="`??purge`", value="Cleans up recent messages.", inline=False)
             embed.add_field(name="`??warn` / `??unwarn`", value="Issues or removes warnings.", inline=False)
             embed.add_field(name="`??warnings`", value="Checks a user's warning history.", inline=False)
-            embed.add_field(name="`??warnexpiry`", value="Configures warning expiration time.", inline=False)
             embed.add_field(name="`??antinuke` / `??antiraid`", value="Security and protection suites.", inline=False)
             embed.add_field(name="`??lockdown` / `??unlockdown`", value="Server-wide lockdown controls.", inline=False)
+
+        elif selected == "channels":
+            embed = discord.Embed(
+                title="🔒 ∙ Channel Management Commands",
+                description="Keep channels neat, tidy, and cozy~",
+                color=discord.Color.from_rgb(255, 218, 185)
+            )
+            embed.add_field(name="`??purge [amount]`", value="Cleans up recent messages in the channel.", inline=False)
+            embed.add_field(name="`??lock`", value="Locks the current channel for a cozy break.", inline=False)
+            embed.add_field(name="`??unlock`", value="Unlocks the channel for chatting.", inline=False)
 
         elif selected == "tickets":
             embed = discord.Embed(
@@ -60,9 +70,7 @@ class HelpDropdown(discord.ui.Select):
             embed.add_field(name="`??messages` [@user]", value="Checks total message counts.", inline=False)
             embed.add_field(name="`??vctop`", value="Shows top voice channel activity stars.", inline=False)
             embed.add_field(name="`??resetstats`", value="Resets message or VC statistics.", inline=False)
-            embed.add_field(name="`??truth`", value="Asks a cozy truth question.", inline=False)
-            embed.add_field(name="`??dare`", value="Gives a cute and fun dare.", inline=False)
-            embed.add_field(name="`??tod`", value="Randomly picks either truth or dare for you!", inline=False)
+            embed.add_field(name="`??truth` / `??dare` / `??tod`", value="Fun and cozy games to play together!", inline=False)
 
         elif selected == "utility":
             embed = discord.Embed(
@@ -78,7 +86,7 @@ class HelpDropdown(discord.ui.Select):
 
 class HelpView(discord.ui.View):
     def __init__(self):
-        super().__init__(timeout=None)
+        super().__init__(timeout=None)  # Tärkeä: pitää valikon aktiivisena ikuisesti!
         self.add_item(HelpDropdown())
 
 class HelpMenu(commands.Cog):
