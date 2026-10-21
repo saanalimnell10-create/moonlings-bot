@@ -2,41 +2,21 @@ import os
 import asyncio
 import discord
 from discord.ext import commands
-from flask import Flask
-from threading import Thread
+from keep_alive import keep_alive
 
-# --- 1. FLASK SERVER (Pitää botin pystyssä 24/7 Renderissä) ---
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "Moonlings Bot is Online!"
-
-def run():
-    app.run(host='0.0.0.0', port=8080)
-
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-
-# --- 2. BOTIN PERUSASETUKSET ---
+# Asetetaan intenteille oikeudet
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix="??", intents=intents, help_command=None)
+bot = commands.Bot(command_prefix="??", intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user} (ID: {bot.user.id})")
-    print("Moonlings bot is online and ready!")
-    await bot.change_presence(activity=discord.Game(name="??help | Moonlings"))
+    print(f"Logged in as {bot.user.name} ({bot.user.id})")
 
-# --- 3. AUTOMAATTINEN COGS-LATAJA (Lataa uudet tiedostot automaattisesti) ---
 async def load_extensions():
-    if not os.path.exists("./cogs"):
-        os.makedirs("./cogs")
-        
+    # Käydään läpi cogs-kansio ja ladataan jokainen .py-tiedosto automaattisesti
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             cog_name = filename[:-3]
@@ -51,10 +31,10 @@ async def main():
         await load_extensions()
         TOKEN = os.getenv("DISCORD_TOKEN")
         if TOKEN:
-            keep_alive()
             await bot.start(TOKEN)
         else:
             print("Virhe: DISCORD_TOKENia ei löytynyt ympäristömuuttujista!")
 
 if __name__ == "__main__":
+    keep_alive()  # Käynnistetään Flask keep-alive -palvelin heti alussa
     asyncio.run(main())
