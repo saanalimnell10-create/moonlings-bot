@@ -10,7 +10,7 @@ class Reply(commands.Cog):
     async def reply_command(self, ctx, message_id: int, *, message_text: str):
         await ctx.message.delete()
 
-        # Etsitään viesti nykyiseltä kanavalta
+        # Etsitään viesti kanavalta ID:n perusteella
         try:
             target_message = await ctx.channel.fetch_message(message_id)
         except discord.NotFound:
@@ -20,16 +20,8 @@ class Reply(commands.Cog):
             await ctx.send("❌ Failed to fetch the message. Please check the ID and try again~", delete_after=5)
             return
 
-        # Luodaan kaunis pastellinen Embed-vastaus
-        embed = discord.Embed(
-            title="💬 ∙ Message Reply",
-            description=message_text,
-            color=discord.Color.from_rgb(255, 192, 203)
-        )
-        embed.set_footer(text=f"Replied by {ctx.author.display_name} 🌙", icon_url=ctx.author.display_avatar.url)
-
-        # Vastataan suoraan kyseiseen viestiin
-        await target_message.reply(embed=embed)
+        # Vastataan suoraan tavallisella tekstiviestillä (Discord tekee siihen sen pienen vastausviivan)
+        await target_message.reply(message_text)
 
     @reply_command.error
     async def reply_error(self, ctx, error):
