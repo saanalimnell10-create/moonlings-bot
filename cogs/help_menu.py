@@ -1,111 +1,106 @@
 import discord
 from discord.ext import commands
+import io
 
-class HelpDropdown(discord.ui.Select):
+class TicketDropdown(discord.ui.Select):
     def __init__(self):
         options = [
-            discord.SelectOption(
-                label="Moderation", description="Keep the server safe and cozy! 🛡️", emoji="🛡️", value="moderation"
-            ),
-            discord.SelectOption(
-                label="Channel Management", description="Lock, unlock and purge channels 🧹", emoji="🔒", value="channels"
-            ),
-            discord.SelectOption(
-                label="Tickets", description="Support and help ticket system 🎫", emoji="🎫", value="tickets"
-            ),
-            discord.SelectOption(
-                label="Community", description="Counting, stats, games and fun! 🌸", emoji="✨", value="community"
-            ),
-            discord.SelectOption(
-                label="Utility", description="AFK, bump reminders and tools ☁️", emoji="🛠️", value="utility"
-            )
+            discord.SelectOption(label="Staff Complaint", description="Report an issue regarding a staff member", emoji="🛡️", value="staff_complaint"),
+            discord.SelectOption(label="Promo & Sponsorship", description="Inquire about partnerships and promos", emoji="✨", value="promo"),
+            discord.SelectOption(label="Giveaway Claim", description="Claim a giveaway reward you won", emoji="🎁", value="giveaway"),
+            discord.SelectOption(label="Staff Applications", description="Apply to join our cozy team", emoji="📝", value="application"),
         ]
-        super().__init__(placeholder="Select a category to explore~ 🫧", min_values=1, max_values=1, options=options)
+        super().__init__(placeholder="Select a category to open a ticket~ 🎫", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        selected = self.values[0]
+        guild = interaction.guild
+        user = interaction.user
+        category_name = self.values[0].replace("_", " ").title()
 
-        if selected == "moderation":
-            embed = discord.Embed(
-                title="🛡️ ∙ Moderation Commands",
-                description="Keep Moonlings safe and cozy with these administrative tools~",
-                color=discord.Color.from_rgb(255, 182, 193)
-            )
-            embed.add_field(name="`??kick`", value="Kicks a naughty member from the server.", inline=False)
-            embed.add_field(name="`??ban`", value="Bans a user from the galaxy.", inline=False)
-            embed.add_field(name="`??mute`", value="Timeouts a member to chill out.", inline=False)
-            embed.add_field(name="`??warn` / `??unwarn`", value="Issues or removes warnings.", inline=False)
-            embed.add_field(name="`??warnings`", value="Checks a user's warning history.", inline=False)
-            embed.add_field(name="`??antinuke` / `??antiraid`", value="Security and protection suites.", inline=False)
-            embed.add_field(name="`??lockdown` / `??unlockdown`", value="Server-wide lockdown controls.", inline=False)
+        # Etsitään tai luodaan Tickets-kategoria
+        category = discord.utils.get(guild.categories, name="Tickets")
+        if not category:
+            category = await guild.create_category("Tickets")
 
-        elif selected == "channels":
-            embed = discord.Embed(
-                title="🔒 ∙ Channel Management Commands",
-                description="Keep channels neat, tidy, and cozy~",
-                color=discord.Color.from_rgb(255, 218, 185)
-            )
-            embed.add_field(name="`??purge [amount]`", value="Cleans up recent messages in the channel.", inline=False)
-            embed.add_field(name="`??lock`", value="Locks the current channel for a cozy break.", inline=False)
-            embed.add_field(name="`??unlock`", value="Unlocks the channel for chatting.", inline=False)
+        # Tarkistetaan onko käyttäjällä jo auki oleva tiketti
+        channel_name = f"ticket-{user.name.lower().replace(' ', '-')}"
+        existing_channel = discord.utils.get(guild.text_channels, name=channel_name)
 
-        elif selected == "tickets":
-            embed = discord.Embed(
-                title="🎫 ∙ Ticket System Commands",
-                description="Manage support channels and inquiries easily~",
-                color=discord.Color.from_rgb(175, 238, 238)
-            )
-            embed.add_field(name="`??setup`", value="Deploys the interactive ticket panel.", inline=False)
-            embed.add_field(name="`??close`", value="Closes an active ticket and logs the transcript.", inline=False)
+        if existing_channel:
+            await interaction.response.send_message(f"❌ You already have an open ticket here: {existing_channel.mention}~", ephemeral=True)
+            return
 
-        elif selected == "community":
-            embed = discord.Embed(
-                title="✨ ∙ Community & Fun Commands",
-                description="Games, stats, counting, and socializing stars!",
-                color=discord.Color.from_rgb(230, 230, 250)
-            )
-            embed.add_field(name="`??setcounting`", value="Sets up the chill counting game channel.", inline=False)
-            embed.add_field(name="`??resetcount`", value="Resets the counting score back to 0.", inline=False)
-            embed.add_field(name="`??top` [daily/weekly/all]", value="Shows active message leaderboards.", inline=False)
-            embed.add_field(name="`??messages` [@user]", value="Checks total message counts.", inline=False)
-            embed.add_field(name="`??vctop`", value="Shows top voice channel activity stars.", inline=False)
-            embed.add_field(name="`??resetstats`", value="Resets message or VC statistics.", inline=False)
-            embed.add_field(name="`??truth` / `??dare` / `??tod`", value="Fun and cozy games to play together!", inline=False)
+        # Oikeudet: Vain käyttäjä ja ylläpito näkevät kanavan
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            user: discord.PermissionOverwrite(read_messages=True, send_messages=True, attach_files=True),
+            guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_channels=True)
+        }
 
-        elif selected == "utility":
-            embed = discord.Embed(
-                title="🛠️ ∙ Utility & Tools",
-                description="Handy tools and helpers for everyone in the cosmos~",
-                color=discord.Color.from_rgb(176, 224, 230)
-            )
-            embed.add_field(name="`??afk` [reason]", value="Sets your status to AFK with [AFK] tag and ping memory.", inline=False)
-            embed.add_field(name="`??setbumpchannel`", value="Sets the channel for Star Bumps reminders and pookies ping! 🌌", inline=False)
+        ticket_channel = await guild.create_text_channel(name=channel_name, category=category, overwrites=overwrites)
 
-        embed.set_footer(text="Moonlings Help Menu 🌙", icon_url=interaction.client.user.display_avatar.url)
-        await interaction.response.edit_message(embed=embed)
+        embed = discord.Embed(
+            title=f"🎫 ∙ Ticket: {category_name}",
+            description=f"Welcome {user.mention}! ✨\nOur staff team will be with you shortly. Please explain your issue or request in detail below~ 🌸",
+            color=discord.Color.from_rgb(175, 238, 238)
+        )
+        embed.set_footer(text="Type ??close to close this ticket 🌙", icon_url=user.display_avatar.url)
 
-class HelpView(discord.ui.View):
+        await ticket_channel.send(embed=embed)
+        await interaction.response.send_message(f"✨ Ticket created! Head over to {ticket_channel.mention}~", ephemeral=True)
+
+class TicketView(discord.ui.View):
     def __init__(self):
-        super().__init__(timeout=None)  # Tärkeä: pitää valikon aktiivisena ikuisesti!
-        self.add_item(HelpDropdown())
+        super().__init__(timeout=None)
+        self.add_item(TicketDropdown())
 
-class HelpMenu(commands.Cog):
+class Tickets(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="help")
-    async def help_command(self, ctx):
+    @commands.command(name="setup")
+    @commands.has_permissions(administrator=True)
+    async def setup_tickets(self, ctx):
         await ctx.message.delete()
-        
+
         embed = discord.Embed(
-            title="🌸 ∙ Welcome to Moonlings Help Menu",
-            description="Hello traveler! ✨ Use the dropdown menu below to explore categories and discover all the cozy features of our server~ ☁️",
+            title="🎫 ∙ Moonlings Support Center",
+            description="Need help, want to apply, or claim a giveaway reward? ✨\nSelect the appropriate category from the dropdown menu below to open a private ticket channel~ 🌸",
             color=discord.Color.from_rgb(255, 192, 203)
         )
-        embed.set_footer(text="Moonlings Bot 🌙", icon_url=self.bot.user.display_avatar.url)
-        
-        view = HelpView()
+        embed.set_footer(text="Moonlings Support System 🌙", icon_url=self.bot.user.display_avatar.url)
+
+        view = TicketView()
         await ctx.send(embed=embed, view=view)
 
+    @commands.command(name="close")
+    async def close_ticket(self, ctx):
+        if not ctx.channel.name.startswith("ticket-"):
+            await ctx.send("❌ This command can only be used inside a ticket channel~", delete_after=5)
+            return
+
+        await ctx.send("🔒 Closing ticket and generating transcript in 5 seconds...")
+
+        # Kerätään viestit transkriptia varten
+        messages = []
+        async for msg in ctx.channel.history(limit=500, oldest_first=True):
+            messages.append(f"[{msg.created_at.strftime('%Y-%m-%d %H:%M')}] {msg.author}: {msg.content}")
+
+        transcript_text = "\n".join(messages)
+        file_data = io.BytesIO(transcript_text.encode("utf-8"))
+        transcript_file = discord.File(file_data, filename=f"{ctx.channel.name}-transcript.txt")
+
+        # Etsitään #ticket-logs kanava
+        log_channel = discord.utils.get(ctx.guild.text_channels, name="ticket-logs")
+        if log_channel:
+            log_embed = discord.Embed(
+                title="📜 ∙ Ticket Closed Transcript",
+                description=f"Ticket **#{ctx.channel.name}** was closed by {ctx.author.mention}~ 🌸",
+                color=discord.Color.from_rgb(230, 230, 250)
+            )
+            await log_channel.send(embed=log_embed, file=transcript_file)
+
+        await ctx.channel.delete()
+
 async def setup(bot):
-    await bot.add_cog(HelpMenu(bot))
+    await bot.add_cog(Tickets(bot))
