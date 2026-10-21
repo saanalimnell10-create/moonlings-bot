@@ -1,123 +1,157 @@
 import discord
 from discord.ext import commands
-from discord.ui import Select, View
+import datetime
 
-class HelpSelect(Select):
-    def __init__(self):
-        options = [
-            discord.SelectOption(
-                label="Moderation & Security",
-                description="Keep our cozy space station safe and sound~ 🛡️",
-                emoji="🚀",
-                value="moderation"
-            ),
-            discord.SelectOption(
-                label="Tickets & Support",
-                description="Need help? Float into a cozy starlight bubble 💌",
-                emoji="🪐",
-                value="tickets"
-            ),
-            discord.SelectOption(
-                label="Community & Games",
-                description="Counting, cute partnerships & star-fishing! 🎮",
-                emoji="⭐",
-                value="community"
-            ),
-            discord.SelectOption(
-                label="Utility & Tools",
-                description="AFK moon tags, sweet stats & star tools ☁️",
-                emoji="🌙",
-                value="utility"
-            ),
-        ]
-        super().__init__(placeholder="make a selection under the stars, cutie~ ✨", min_values=1, max_values=1, options=options)
-
-    async def callback(self, interaction: discord.Interaction):
-        if self.values[0] == "moderation":
-            embed = discord.Embed(
-                title="🚀 ∙ Cozy Space Moderation",
-                description="Soft star-tools to keep our galaxy peaceful and lovely~ 🌌✨",
-                color=discord.Color.from_rgb(135, 206, 250)
-            )
-            embed.add_field(name="Commands", value=(
-                "`??kick @user [reason]` - Gently guide a member back to Earth\n"
-                "`??ban @user [reason]` - Send a mischievous soul to deep space\n"
-                "`??mute @user [minutes]` - Give a quiet zero-gravity timeout\n"
-                "`??warn @user [reason]` - Give a soft warning\n"
-                "`??unwarn @user` - Remove a member's warning\n"
-                "`??warnings [@user]` - Check active warnings\n"
-                "`??warnexpiry [days/off]` - Set warning expiration time\n"
-                "`??lock / ??unlock` - Lock or unlock sleepy starlight channels\n"
-                "`??purge [amount]` - Sweep away cosmic dust\n"
-                "`??antinuke / ??antiraid` - Keep our sweet space home safe"
-            ), inline=False)
-            embed.set_footer(text="Moonlings Starlight Protection 🌠", icon_url=interaction.client.user.display_avatar.url)
-            await interaction.response.edit_message(embed=embed)
-
-        elif self.values[0] == "tickets":
-            embed = discord.Embed(
-                title="🪐 ∙ Starlight Support & Tickets",
-                description="Got a question or want to join the crew? Open a sweet ticket! 💌",
-                color=discord.Color.from_rgb(230, 230, 250)
-            )
-            embed.add_field(name="Commands", value=(
-                "`??setup` - Spawn the interactive space support menu\n"
-                "`??close` - Close the ticket bubble and save a cute transcript"
-            ), inline=False)
-            embed.set_footer(text="Moonlings Space Café 🌙", icon_url=interaction.client.user.display_avatar.url)
-            await interaction.response.edit_message(embed=embed)
-
-        elif self.values[0] == "community":
-            embed = discord.Embed(
-                title="⭐ ∙ Galaxy Community & Games",
-                description="Let's giggle, count shooting stars, and play together! ☁️✨",
-                color=discord.Color.from_rgb(221, 160, 221)
-            )
-            embed.add_field(name="Commands", value=(
-                "`??partner @user [details]` - Share a sweet constellation partnership\n"
-                "`??setcounting` - Start our endless chill star-counting game\n"
-                "`??tod` - Play Truth or Dare with cute glowing buttons\n"
-                "`??truth` / `??dare` - Draw a fun random space question"
-            ), inline=False)
-            embed.set_footer(text="Moonlings Cosmic Garden 🌠", icon_url=interaction.client.user.display_avatar.url)
-            await interaction.response.edit_message(embed=embed)
-
-        elif self.values[0] == "utility":
-            embed = discord.Embed(
-                title="🌙 ∙ Moonlit Utility & Star Tools",
-                description="Little ribbons and magical gadgets for your cosmic adventures~ 🧸",
-                color=discord.Color.from_rgb(255, 182, 193)
-            )
-            embed.add_field(name="Commands", value=(
-                "`??afk [reason]` - Float away to sleep with a cute [AFK] moon tag\n"
-                "`??top daily/weekly/all` - Check our active chat comets\n"
-                "`??vctop` - See who hangs out the most in nebula voice chats\n"
-                "`??tz set [zone]` / `??tz @user` - Check friend timezones across galaxies\n"
-                "`??steal [emoji]` - Collect a stray cute starlight emoji\n"
-                "`??clone` - Duplicate a cozy channel layout"
-            ), inline=False)
-            embed.set_footer(text="Moonlings Magical Galaxy ✨", icon_url=interaction.client.user.display_avatar.url)
-            await interaction.response.edit_message(embed=embed)
-
-class HelpView(View):
-    def __init__(self):
-        super().__init__(timeout=180)
-        self.add_item(HelpSelect())
-
-class HelpMenu(commands.Cog):
+class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.warnings = {}  # {user_id: [{"reason": syy, "moderator": mod, "time": aika}]}
 
-    @commands.command(name="help")
-    async def help_command(self, ctx):
+    # 1. KICK KOMENTO
+    @commands.command(name="kick")
+    @commands.has_permissions(kick_members=True)
+    async def kick_user(self, ctx, member: discord.Member, *, reason: str = "No reason provided~ 🌸"):
+        await ctx.message.delete()
+        if member.top_role >= ctx.author.top_role:
+            await ctx.send("❌ You cannot kick someone with an equal or higher role, cutie~", delete_after=5)
+            return
+
+        await member.kick(reason=reason)
+
         embed = discord.Embed(
-            title="🌙 ∙ Moonlings Cosmic Help Menu",
-            description="Welcome to **Moonlings**! Please pick a cozy star category from the dropdown menu below~ 🌸✨",
-            color=discord.Color.from_rgb(255, 192, 203)
+            title="👢 ∙ Member Kicked",
+            description=f"**{member.display_name}** has been kicked from the cosmos~ ✨",
+            color=discord.Color.from_rgb(255, 182, 193)
         )
-        embed.set_footer(text="Made with love under the stars 🚀", icon_url=ctx.bot.user.display_avatar.url)
-        
-        await ctx.send(embed=embed, view=HelpView())
+        embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
+        embed.set_footer(text="Moonlings Moderation 🛡️", icon_url=self.bot.user.display_avatar.url)
+        await ctx.send(embed=embed)
+
+    # 2. BAN KOMENTO
+    @commands.command(name="ban")
+    @commands.has_permissions(ban_members=True)
+    async def ban_user(self, ctx, member: discord.Member, *, reason: str = "No reason provided~ 🌸"):
+        await ctx.message.delete()
+        if member.top_role >= ctx.author.top_role:
+            await ctx.send("❌ You cannot ban someone with an equal or higher role, cutie~", delete_after=5)
+            return
+
+        await member.ban(reason=reason)
+
+        embed = discord.Embed(
+            title="🔨 ∙ Member Banned",
+            description=f"**{member.display_name}** has been banned from the galaxy~ 🌌",
+            color=discord.Color.from_rgb(255, 105, 180)
+        )
+        embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
+        embed.set_footer(text="Moonlings Moderation 🛡️", icon_url=self.bot.user.display_avatar.url)
+        await ctx.send(embed=embed)
+
+    # 3. MUTE KOMENTO (TIMEOUT)
+    @commands.command(name="mute")
+    @commands.has_permissions(moderate_members=True)
+    async def mute_user(self, ctx, member: discord.Member, minutes: int = 10, *, reason: str = "Taking a quiet time-out~ ☁️"):
+        await ctx.message.delete()
+        if member.top_role >= ctx.author.top_role:
+            await ctx.send("❌ You cannot mute someone with an equal or higher role, cutie~", delete_after=5)
+            return
+
+        duration = datetime.timedelta(minutes=minutes)
+        await member.timeout(duration, reason=reason)
+
+        embed = discord.Embed(
+            title="🤐 ∙ Member Muted",
+            description=f"**{member.display_name}** has been muted for **{minutes} minutes**~ 🌸",
+            color=discord.Color.from_rgb(230, 230, 250)
+        )
+        embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
+        embed.set_footer(text="Moonlings Moderation 🛡️", icon_url=self.bot.user.display_avatar.url)
+        await ctx.send(embed=embed)
+
+    # 4. WARN KOMENTO
+    @commands.command(name="warn")
+    @commands.has_permissions(manage_messages=True)
+    async def warn_user(self, ctx, member: discord.Member, *, reason: str = "Please follow the cozy rules~ 🌸"):
+        await ctx.message.delete()
+        if member.id not in self.warnings:
+            self.warnings[member.id] = []
+
+        warn_data = {
+            "reason": reason,
+            "moderator": ctx.author.display_name,
+            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
+        self.warnings[member.id].append(warn_data)
+
+        embed = discord.Embed(
+            title="⚠️ ∙ Warning Issued",
+            description=f"**{member.mention}** received a gentle warning~ ☁️",
+            color=discord.Color.from_rgb(255, 218, 185)
+        )
+        embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
+        embed.add_field(name="Total Warnings", value=f"**{len(self.warnings[member.id])}**", inline=True)
+        embed.set_footer(text="Moonlings Moderation 🛡️", icon_url=self.bot.user.display_avatar.url)
+        await ctx.send(embed=embed)
+
+    # 5. WARNINGS CHECK KOMENTO
+    @commands.command(name="warnings")
+    @commands.has_permissions(manage_messages=True)
+    async def check_warnings(self, ctx, member: discord.Member):
+        await ctx.message.delete()
+        user_warns = self.warnings.get(member.id, [])
+
+        if not user_warns:
+            embed = discord.Embed(
+                title="✨ ∙ Warning History",
+                description=f"**{member.display_name}** has a clean record! No warnings found~ 🌸",
+                color=discord.Color.from_rgb(175, 238, 238)
+            )
+            await ctx.send(embed=embed)
+            return
+
+        embed = discord.Embed(
+            title=f"📜 ∙ Warning History for {member.display_name}",
+            description=f"Total warnings: **{len(user_warns)}**",
+            color=discord.Color.from_rgb(255, 182, 193)
+        )
+
+        for idx, warn in enumerate(user_warns, 1):
+            embed.add_field(
+                name=f"Warning #{idx}",
+                value=f"**Reason:** {warn['reason']}\n**By:** {warn['moderator']} ({warn['time']})",
+                inline=False
+            )
+
+        await ctx.send(embed=embed)
+
+    # 6. UNWARN KOMENTO
+    @commands.command(name="unwarn")
+    @commands.has_permissions(manage_messages=True)
+    async def unwarn_user(self, ctx, member: discord.Member):
+        await ctx.message.delete()
+        if member.id in self.warnings and self.warnings[member.id]:
+            self.warnings[member.id].pop()
+            msg = f"Removed the latest warning for **{member.display_name}**~ 🌸"
+        else:
+            msg = f"**{member.display_name}** has no warnings to remove~ 🫧"
+
+        embed = discord.Embed(
+            title="✨ ∙ Warning Removed",
+            description=msg,
+            color=discord.Color.from_rgb(175, 238, 238)
+        )
+        await ctx.send(embed=embed)
+
+    # Virheiden hallinta
+    @kick_user.error
+    @ban_user.error
+    @mute_user.error
+    @warn_user.error
+    async def mod_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("❌ You don't have permission to use this command, sweetie~", delete_after=5)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("❌ Please mention a member to use this command~", delete_after=5)
 
 async def setup(bot):
-    await bot.add_cog(HelpMenu(bot))
+    await bot.add_cog(Moderation(bot))
