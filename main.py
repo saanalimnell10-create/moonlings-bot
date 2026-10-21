@@ -14,6 +14,7 @@ bot = commands.Bot(command_prefix="??", intents=intents)
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user.name} ({bot.user.id})")
+    print("Moonlings is online and cozy! 🌸✨")
 
 async def load_extensions():
     # Käydään läpi cogs-kansio ja ladataan jokainen .py-tiedosto automaattisesti
@@ -36,5 +37,5 @@ async def main():
             print("Virhe: DISCORD_TOKENia ei löytynyt ympäristömuuttujista!")
 
 if __name__ == "__main__":
-    keep_alive()  # Käynnistetään Flask keep-alive -palvelin heti alussa
+    keep_alive()  # Käynnistetään Flask keep-alive -palvelin
     asyncio.run(main())
