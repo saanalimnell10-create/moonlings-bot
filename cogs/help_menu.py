@@ -6,7 +6,7 @@ class HelpDropdown(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="Moderation & Transparency",
-                description="Warns, kicks, bans, and transparent DM logs.",
+                description="Warns with DM logs, kicks, and bans.",
                 emoji="🛡️"
             ),
             discord.SelectOption(
@@ -39,10 +39,9 @@ class HelpDropdown(discord.ui.Select):
                 description="Keeping Moonlings safe, cozy, and fair!",
                 color=0xFFB7C5
             )
-            embed.add_field(name="??warn [@user] [reason]", value="Warns a member and automatically sends a transparent pastel DM log with case ID and evidence.", inline=False)
-            embed.add_field(name="Transparent DM Logs", value="Sends moderator info, reasons, and case numbers directly to punished users' DMs.", inline=False)
+            embed.add_field(name="??warn [@user] [reason]", value="Warns a member and automatically sends a transparent pastel DM log containing the moderator, reason, and a unique Case ID.", inline=False)
             embed.add_field(name="??mute / ??unwarn / ??warnings", value="Mute rule-breakers or check warning history.", inline=False)
-            embed.add_field(name="??kick / ??ban", value="Kicks or bans users from the server.", inline=False)
+            embed.add_field(name="??kick / ??ban", value="Standard safety tools to keep rule-breakers away.", inline=False)
 
         elif self.values[0] == "Channel Management":
             embed = discord.Embed(
