@@ -5,31 +5,30 @@ import asyncio
 class BumpReminder(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # Tallennetaan kanavakohtainen muistutuskanava väliaikaisesti muistiin
         self.bump_channels = {}
 
     @commands.command(name="setbumpchannel")
     @commands.has_permissions(manage_guild=True)
     async def setbumpchannel(self, ctx, channel: discord.TextChannel = None):
-        """Asettaa kanavan,neen jonne bump-muistutukset lähetetään."""
+        """Configures the channel for Star Bump reminders."""
         if not channel:
             channel = ctx.channel
         
         self.bump_channels[ctx.guild.id] = channel.id
         
         embed = discord.Embed(
-            title="🌸 Bump-kanava asetettu! ✨",
-            description=f"Tästä lähtien bump-muistutukset lähetetään tälle kanavalle: {channel.mention} 🌙",
+            title="⭐ Star Bumps Channel Set!",
+            description=f"This cozy channel ({channel.mention}) is now our official bump spot!\nI'll keep track of the 2-hour orbit and call out the pookies when it's time~ 🌸",
             color=0xFFB7C5
         )
         await ctx.send(embed=embed)
 
     @commands.command(name="bump")
     async def bump_command(self, ctx):
-        """Muistuttaa miten palvelinta nostetaan."""
+        """Manual bump reminder info."""
         embed = discord.Embed(
             title="🌸 Star Bump Reminder 🌸",
-            description="Käytä Disboardin **`/bump`**-komentoa nostaaksesi palvelintamme! ✨",
+            description="Use Disboard's **`/bump`** command to help our server shine brighter! ✨",
             color=0xFFB7C5
         )
         embed.set_footer(text="Moonlings Bot • Cozy Space")
@@ -37,7 +36,7 @@ class BumpReminder(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        # Kuunnellaan Disboard-bottia (ID: 302050872383242240)
+        # Listen to Disboard bot (ID: 302050872383242240)
         if message.author.id == 302050872383242240:
             is_successful_bump = False
             
@@ -55,13 +54,13 @@ class BumpReminder(commands.Cog):
                     target_channel = message.channel
 
                 embed = discord.Embed(
-                    title="🌸 Kiitos bumpista! ✨",
-                    description="Moonlings on merkannut onnistuneen bumpin muistiin! Palaan asiaan 2 tunnin päästä. 🌙💫",
+                    title="✨ Yay, Bump Successful!",
+                    description="Thank you for boosting our star power! I've set the 2-hour timer for the next orbit. 🌙",
                     color=0xFFB7C5
                 )
                 await target_channel.send(embed=embed)
                 
-                # Ajastetaan uusi muistutus 2 tunnin päähän (7200 sekuntia)
+                # Schedule the 2-hour reminder (7200 seconds)
                 self.bot.loop.create_task(self.schedule_bump_reminder(target_channel))
 
     async def schedule_bump_reminder(self, channel):
@@ -72,12 +71,12 @@ class BumpReminder(commands.Cog):
         role_mention = bump_role.mention if bump_role else ""
 
         embed = discord.Embed(
-            title="⏰ Aika nostaa palvelinta! ✨",
-            description="Hei tähtityypit! Nyt voi taas käyttää `/bump`-komentoa ja auttaa Moonlingsiä loistamaan kirkkaammin! 🌙💫",
+            title="⏰ Time to Bump the Moon! ✨",
+            description="Hey pookies! It's time to run `/bump` again and help Moonlings glow! 🌙💫",
             color=0xFFD1DC
         )
         
-        content = f"{role_mention} Uuden bumpin aika!" if role_mention else "Uuden bumpin aika! ✨"
+        content = f"{role_mention} Time to bump!" if role_mention else "Time to bump! ✨"
         await channel.send(content=content, embed=embed)
 
 async def setup(bot):
