@@ -5,88 +5,68 @@ class HelpDropdown(discord.ui.Select):
     def __init__(self):
         options = [
             discord.SelectOption(
-                label="Moderation", description="Keep the server safe and cozy! 🛡️", emoji="🛡️", value="moderation"
+                label="Moderation & Transparency",
+                description="View moderation commands and transparent DM logs.",
+                emoji="🛡️"
             ),
             discord.SelectOption(
-                label="Channel Management", description="Lock, unlock and purge channels 🔒", emoji="🔒", value="channels"
+                label="Channel & Management",
+                description="Purge, lock, and channel controls.",
+                emoji="🌊"
             ),
             discord.SelectOption(
-                label="Tickets", description="Support and help ticket system 🎫", emoji="🎫", value="tickets"
+                label="Community & Games",
+                description="Counting, Truth or Dare, and mini-games.",
+                emoji="✨"
             ),
             discord.SelectOption(
-                label="Community & Games", description="Counting, stats, games and fun! 🌸", emoji="✨", value="community"
+                label="Utility & Bumps",
+                description="Star bumps, reminders, and helpful tools.",
+                emoji="🌙"
             ),
-            discord.SelectOption(
-                label="Utility & Bump", description="AFK, Star Bumps and tools ☁️", emoji="🛠️", value="utility"
-            )
         ]
-        super().__init__(placeholder="Select a category to explore~ 🫧", min_values=1, max_values=1, options=options)
+        super().__init__(placeholder="Select a category to explore~ 🌸", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        # Kuitataan interaktio heti, jotta Discord ei valita "Interaction Failed"
-        await interaction.response.defer()
-
-        selected = self.values[0]
-
-        if selected == "moderation":
+        if self.values[0] == "Moderation & Transparency":
             embed = discord.Embed(
-                title="🛡️ ∙ Moderation Commands",
-                description="Keep Moonlings safe and cozy with these administrative tools~",
-                color=discord.Color.from_rgb(255, 182, 193)
+                title="🛡️ Moderation & Transparency",
+                description="Keeping Moonlings safe and fair for everyone!",
+                color=0xFFB7C5
             )
-            embed.add_field(name="`??kick [@user] [reason]`", value="Kicks a member from the server.", inline=False)
-            embed.add_field(name="`??ban [@user] [reason]`", value="Bans a user from the galaxy.", inline=False)
-            embed.add_field(name="`??mute [@user] [minutes] [reason]`", value="Timeouts a member to chill out.", inline=False)
-            embed.add_field(name="`??warn [@user] [reason]`", value="Issues a gentle warning to a user.", inline=False)
-            embed.add_field(name="`??unwarn [@user]`", value="Removes the latest warning from a user.", inline=False)
-            embed.add_field(name="`??warnings [@user]`", value="Checks a user's warning history.", inline=False)
+            embed.add_field(name="??warn [@user] [reason]", value="Warns a member and sends a transparent pastel DM log with case ID and evidence.", inline=False)
+            embed.add_field(name="Transparent DM Logs", value="Automatically sends moderator info, reasons, and case numbers to punished members.", inline=False)
+            embed.add_field(name="??kick / ??ban", value="Standard safety tools to keep rule-breakers away.", inline=False)
 
-        elif selected == "channels":
+        elif self.values[0] == "Channel & Management":
             embed = discord.Embed(
-                title="🔒 ∙ Channel Management Commands",
-                description="Keep channels neat, tidy, and cozy~",
-                color=discord.Color.from_rgb(255, 218, 185)
+                title="🌊 Channel Management",
+                description="Tools for keeping chat clean and cozy.",
+                color=0xB5EAD7
             )
-            embed.add_field(name="`??purge [amount]`", value="Cleans up recent messages in the channel.", inline=False)
-            embed.add_field(name="`??lock`", value="Locks the current channel for a cozy break.", inline=False)
-            embed.add_field(name="`??unlock`", value="Unlocks the channel for chatting.", inline=False)
+            embed.add_field(name="??purge [amount]", value="Quickly cleans up messages.", inline=False)
+            embed.add_field(name="??lock / ??unlock", value="Locks or unlocks a channel.", inline=False)
 
-        elif selected == "tickets":
+        elif self.values[0] == "Community & Games":
             embed = discord.Embed(
-                title="🎫 ∙ Ticket System Commands",
-                description="Manage support channels and inquiries easily~",
-                color=discord.Color.from_rgb(175, 238, 238)
+                title="✨ Community & Games",
+                description="Fun activities for all the pookies in chat!",
+                color=0xFFD1DC
             )
-            embed.add_field(name="`??setup`", value="Deploys the interactive ticket panel.", inline=False)
-            embed.add_field(name="`??close`", value="Closes an active ticket and logs the transcript.", inline=False)
+            embed.add_field(name="??truth / ??dare / ??tod", value="Play Truth or Dare with friends.", inline=False)
+            embed.add_field(name="Chill Counting", value="Count together in the designated channel!", inline=False)
 
-        elif selected == "community":
+        elif self.values[0] == "Utility & Bumps":
             embed = discord.Embed(
-                title="✨ ∙ Community & Fun Commands",
-                description="Games, stats, counting, and socializing stars!",
-                color=discord.Color.from_rgb(230, 230, 250)
+                title="🌙 Utility & Bumps",
+                description="Server boosts and helper commands.",
+                color=0xC7CEEA
             )
-            embed.add_field(name="`??setcounting`", value="Sets up the chill counting game channel.", inline=False)
-            embed.add_field(name="`??resetcount`", value="Resets the counting score back to 0.", inline=False)
-            embed.add_field(name="`??top [daily/weekly/all]`", value="Shows active message leaderboards.", inline=False)
-            embed.add_field(name="`??messages [@user]`", value="Checks total message counts.", inline=False)
-            embed.add_field(name="`??vctop`", value="Shows top voice channel activity stars.", inline=False)
-            embed.add_field(name="`??resetstats`", value="Resets message or VC statistics.", inline=False)
-            embed.add_field(name="`??truth` / `??dare` / `??tod`", value="Fun and cozy games to play together!", inline=False)
+            embed.add_field(name="??bump", value="Instructions for bumping the server via Disboard.", inline=False)
+            embed.add_field(name="??setbumpchannel", value="Sets the official cozy bump reminder channel.", inline=False)
 
-        elif selected == "utility":
-            embed = discord.Embed(
-                title="🛠️ ∙ Utility & Tools",
-                description="Handy tools and helpers for everyone in the cosmos~",
-                color=discord.Color.from_rgb(176, 224, 230)
-            )
-            embed.add_field(name="`??afk [reason]`", value="Sets your status to AFK with [AFK] tag and ping memory.", inline=False)
-            embed.add_field(name="`??bump`", value="Logs a Disboard bump and starts the 2-hour Star Bump timer! 🌌", inline=False)
-            embed.add_field(name="`??bumptime`", value="Checks how much time is left until the next bump.", inline=False)
-            embed.add_field(name="`??setbumpchannel`", value="Configures the channel for Star Bump reminders.", inline=False)
-
-        embed.set_footer(text="Moonlings Help Menu 🌙", icon_url=interaction.client.user.display_avatar.url)
-        await interaction.edit_original_response(embed=embed)
+        embed.set_footer(text="Moonlings Bot • Cozy Space & Sea Aesthetic 🌸")
+        await interaction.response.edit_message(embed=embed)
 
 class HelpView(discord.ui.View):
     def __init__(self):
@@ -99,14 +79,14 @@ class HelpMenu(commands.Cog):
 
     @commands.command(name="help")
     async def help_command(self, ctx):
-        await ctx.message.delete()
-        
+        """Displays the interactive pastel help menu."""
         embed = discord.Embed(
-            title="🌸 ∙ Welcome to Moonlings Help Menu",
-            description="Hello traveler! ✨ Use the dropdown menu below to explore categories and discover all the cozy features of our server~ ☁️",
-            color=discord.Color.from_rgb(255, 192, 203)
+            title="🌙 Moonlings Help Menu 🌙",
+            description="Welcome to Moonlings! Choose a category from the dropdown menu below to explore our features.",
+            color=0xFFB7C5
         )
-        embed.set_footer(text="Moonlings Bot 🌙", icon_url=self.bot.user.display_avatar.url)
+        embed.set_image(url="https://i.imgur.com/example.png") # Voit vaihtaa oman bannerin tähän
+        embed.set_footer(text="Made with love for cozy communities ✨")
         
         view = HelpView()
         await ctx.send(embed=embed, view=view)
