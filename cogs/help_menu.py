@@ -5,8 +5,8 @@ class HelpDropdown(discord.ui.Select):
     def __init__(self):
         options = [
             discord.SelectOption(
-                label="Moderation",
-                description="Warn, mute, kick, ban and user management.",
+                label="Moderation & Transparency",
+                description="Warns, kicks, bans, and transparent DM logs.",
                 emoji="🛡️"
             ),
             discord.SelectOption(
@@ -33,14 +33,15 @@ class HelpDropdown(discord.ui.Select):
         super().__init__(placeholder="Select a category to explore~ 🌸", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        if self.values[0] == "Moderation":
+        if self.values[0] == "Moderation & Transparency":
             embed = discord.Embed(
-                title="🛡️ Moderation Tools",
-                description="Keeping Moonlings safe and cozy!",
+                title="🛡️ Moderation & Transparency",
+                description="Keeping Moonlings safe, cozy, and fair!",
                 color=0xFFB7C5
             )
-            embed.add_field(name="??warn / ??unwarn", value="Issue or remove warnings from members.", inline=False)
-            embed.add_field(name="??mute / ??warnings", value="Mute rule-breakers or check warning history.", inline=False)
+            embed.add_field(name="??warn [@user] [reason]", value="Warns a member and automatically sends a transparent pastel DM log with case ID and evidence.", inline=False)
+            embed.add_field(name="Transparent DM Logs", value="Sends moderator info, reasons, and case numbers directly to punished users' DMs.", inline=False)
+            embed.add_field(name="??mute / ??unwarn / ??warnings", value="Mute rule-breakers or check warning history.", inline=False)
             embed.add_field(name="??kick / ??ban", value="Kicks or bans users from the server.", inline=False)
 
         elif self.values[0] == "Channel Management":
