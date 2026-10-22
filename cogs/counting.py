@@ -34,9 +34,12 @@ class Counting(commands.Cog):
 
         # Tarkistetaan onko viesti laskentakanavalla
         if self.counting_channel_id and message.channel.id == self.counting_channel_id:
+            # Siivotaan mahdolliset tyhjät välit pois ympäriltä
+            clean_content = message.content.strip()
+
             # Jos viesti on pelkkä numero
-            if message.content.isdigit():
-                user_number = int(message.content)
+            if clean_content.isdigit():
+                user_number = int(clean_content)
 
                 # Eihän sama käyttäjä laske kahdesti peräkkäin
                 if message.author.id == self.last_user_id:
