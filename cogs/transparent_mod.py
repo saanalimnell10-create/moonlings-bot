@@ -30,17 +30,18 @@ class TransparentMod(commands.Cog):
 
         try:
             await member.send(embed=embed)
+            return True
         except discord.Forbidden:
-            # Jos käyttäjällä on DMs kiinni, botti ei kaadu vaan ohittaa sen kiltisti
-            pass
+            # Käyttäjällä on DMs kiinni tai estetty
+            return False
 
     @commands.command(name="warn")
     @commands.has_permissions(kick_members=True)
     async def warn_command(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         """Warns a member and sends a transparent DM log."""
         
-        # Lähetetään läpinäkyvä DM käyttäjälle
-        await self.send_punishment_dm(
+        # Yritetään lähettää läpinäkyvä DM käyttäjälle
+        dm_sent = await self.send_punishment_dm(
             member=member,
             moderator=ctx.author,
             action="Warning",
@@ -49,9 +50,15 @@ class TransparentMod(commands.Cog):
 
         embed = discord.Embed(
             title="🌸 Member Warned",
-            description=f"Successfully warned {member.mention}. Transparent DM log sent!",
-            color=0xB5EAD7  # Mintunvihreä onnistumiselle
+            description=f"Successfully warned {member.mention}!",
+            color=0xB5EAD7
         )
+        
+        if dm_sent:
+            embed.add_field(name="📬 DM Status", value="Transparent DM log sent successfully!", inline=False)
+        else:
+            embed.add_field(name="⚠️ DM Status", value="Could not send DM (User has DMs closed or blocked the bot).", inline=False)
+
         await ctx.send(embed=embed)
 
 async def setup(bot):
