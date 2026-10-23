@@ -30,6 +30,12 @@ class HelpSelect(Select):
                 value="fakeperms"
             ),
             discord.SelectOption(
+                label="Server Tools",
+                description="Steal emojis and clone channel settings.",
+                emoji="🛠️",
+                value="servertools"
+            ),
+            discord.SelectOption(
                 label="Channel Management",
                 description="Purge messages, lock and unlock channels.",
                 emoji="🌊",
@@ -141,7 +147,23 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 5. CHANNEL MANAGEMENT ---
+        # --- 5. SERVER TOOLS ---
+        elif selection == "servertools":
+            embed = discord.Embed(
+                title="🛠️ Server Tools",
+                description="Handy tools for managing server assets and channels.",
+                color=0xFFB6C1
+            )
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??steal [emoji]` – Copies a custom emoji from another server.\n"
+                    "`??clone` – Clones the current channel's settings and permissions."
+                ),
+                inline=False
+            )
+
+        # --- 6. CHANNEL MANAGEMENT ---
         elif selection == "channels":
             embed = discord.Embed(
                 title="🌊 Channel Management",
@@ -158,7 +180,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 6. TICKET SYSTEM ---
+        # --- 7. TICKET SYSTEM ---
         elif selection == "tickets":
             embed = discord.Embed(
                 title="🎫 Ticket System",
@@ -176,7 +198,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 7. COMMUNITY & GAMES ---
+        # --- 8. COMMUNITY & GAMES ---
         elif selection == "games":
             embed = discord.Embed(
                 title="✨ Galaxy Community & Games",
@@ -193,7 +215,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 8. BUMP & REMINDERS ---
+        # --- 9. BUMP & REMINDERS ---
         elif selection == "bump":
             embed = discord.Embed(
                 title="🚀 Bump & Reminders",
@@ -213,7 +235,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 9. UTILITY & TOOLS ---
+        # --- 10. UTILITY & TOOLS ---
         elif selection == "utility":
             embed = discord.Embed(
                 title="🌙 Utility & Tools",
