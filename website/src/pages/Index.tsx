@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowDown, ArrowRight, Bot, Check, ChevronRight, Command, Copy, Gamepad2, Heart, Menu, Search, Shield, Sparkles, Star, X } from "lucide-react";
 
 const inviteUrl = "https://discord.com/oauth2/authorize?client_id=1562025850755616870&permissions=8&integration_type=0&scope=bot";
-const categories = ["All commands", "Moderation", "Anti-Nuke & Anti-Raid", "Threat Security", "Audit Logs", "Conflict Suite", "Custom Fake Permissions", "Channel Management", "Ticket System", "Community Games", "Bump & Reminders", "Server Stats", "Utility & Tools", "Staff Applications", "Server Tools"];
+const categories = ["All commands", "Moderation", "Anti-Nuke & Anti-Raid", "Threat Security", "Audit Logs", "Conflict Suite", "Custom Fake Permissions", "Channel Management", "Ticket System", "Community Games", "Bump & Reminders", "Server Stats", "Utility & Tools", "Staff Applications", "Prefix Settings", "Server Tools"];
 const commands = [
   { name: "warn", category: "Moderation", syntax: "??warn [@member] [reason]", description: "Issue a warning to a member and record the reason.", icon: Shield },
   { name: "kick", category: "Moderation", syntax: "??kick [@member] [reason]", description: "Kick a member from the server.", icon: Shield },
@@ -52,6 +52,8 @@ const commands = [
   { name: "afk", category: "Utility & Tools", syntax: "??afk [reason]", description: "Set your AFK status with an optional reason.", icon: Bot },
   { name: "reply", category: "Utility & Tools", syntax: "??reply [message_id] [message]", description: "Reply to a specific message by its ID.", icon: Bot },
   { name: "help", category: "Utility & Tools", syntax: "??help", description: "Open the interactive help menu.", icon: Bot },
+  { name: "setprefix", category: "Prefix Settings", syntax: "??setprefix [new_prefix]", description: "Save a custom command prefix for this server (administrator only).", icon: Command },
+  { name: "prefix", category: "Prefix Settings", syntax: "??prefix", description: "Show the saved command prefix for this server.", icon: Command },
   { name: "staffapplypanel", category: "Staff Applications", syntax: "??staffapplypanel", description: "Post the staff application panel.", icon: Heart },
   { name: "applyclose", category: "Staff Applications", syntax: "??applyclose", description: "Close a staff application.", icon: Heart },
   { name: "steal", category: "Server Tools", syntax: "??steal [emoji]", description: "Copy a custom emoji from another server.", icon: Bot },
