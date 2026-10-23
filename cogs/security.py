@@ -127,47 +127,5 @@ class Security(commands.Cog):
         embed.set_footer(text="Moonlings Security Suite 🌸")
         await ctx.send(embed=embed)
 
-    # 4. LOCKDOWN (Lukitsee kaikki kanavat kerralla)
-    @commands.command(name="lockdown")
-    @commands.has_permissions(administrator=True)
-    async def lockdown_command(self, ctx):
-        """Instantly locks all public channels in case of an ongoing raid."""
-        await ctx.message.delete()
-        
-        for channel in ctx.guild.text_channels:
-            try:
-                await channel.set_permissions(ctx.guild.default_role, send_messages=False)
-            except Exception:
-                pass
-
-        embed = discord.Embed(
-            title="🚨 ∙ Server Lockdown Activated",
-            description="All channels have been locked down to protect our starry home~ 🪐",
-            color=discord.Color.from_rgb(255, 105, 180)
-        )
-        embed.set_footer(text="Moonlings Security Suite 🌸")
-        await ctx.send(embed=embed)
-
-    # 5. UNLOCK (Avaa kaikki kanavat)
-    @commands.command(name="unlock")
-    @commands.has_permissions(administrator=True)
-    async def unlock_command(self, ctx):
-        """Unlocks all channels after the raid is cleared."""
-        await ctx.message.delete()
-        
-        for channel in ctx.guild.text_channels:
-            try:
-                await channel.set_permissions(ctx.guild.default_role, send_messages=True)
-            except Exception:
-                pass
-
-        embed = discord.Embed(
-            title="✨ ∙ Server Lockdown Lifted",
-            description="All channels are open again! Welcome back, star-farers~ 🌸🚀",
-            color=discord.Color.from_rgb(152, 251, 152)
-        )
-        embed.set_footer(text="Moonlings Security Suite 🌸")
-        await ctx.send(embed=embed)
-
 async def setup(bot):
     await bot.add_cog(Security(bot))
