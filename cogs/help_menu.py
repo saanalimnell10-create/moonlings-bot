@@ -7,9 +7,15 @@ class HelpSelect(Select):
         options = [
             discord.SelectOption(
                 label="Moderation & Transparency",
-                description="Warns, bans, isolation tools, and forced nicknames.",
+                description="Warns, bans, kicks, and timeouts with DM logs.",
                 emoji="🛡️",
                 value="moderation"
+            ),
+            discord.SelectOption(
+                label="Conflict & Safety Suite",
+                description="Isolate arguments, forced names, and member safety.",
+                emoji="🕊️",
+                value="conflict"
             ),
             discord.SelectOption(
                 label="Channel Management",
@@ -56,7 +62,7 @@ class HelpSelect(Select):
         if selection == "moderation":
             embed = discord.Embed(
                 title="🛡️ Moderation & Transparency",
-                description="Transparent moderation tools, conflict isolation, and safety suites.",
+                description="Transparent moderation tools with automated DM logs.",
                 color=0xFFB6C1
             )
             embed.add_field(
@@ -73,6 +79,19 @@ class HelpSelect(Select):
                 name="`??mute [@user] [time] [reason]`",
                 value="Temporarily mutes or timeouts a member.",
                 inline=False
+            )
+            embed.add_field(
+                name="`??clearwarns [@user]`",
+                value="Clears all warnings for the specified user.",
+                inline=False
+            )
+
+        # --- 2. CONFLICT & SAFETY SUITE ---
+        elif selection == "conflict":
+            embed = discord.Embed(
+                title="🕊️ Conflict & Safety Suite",
+                description="Specialized tools for resolving disputes and protecting members.",
+                color=0xFFB6C1
             )
             embed.add_field(
                 name="`??isolate [@user1] [@user2] [reason]`",
@@ -94,13 +113,8 @@ class HelpSelect(Select):
                 value="Removes the forced nickname lock.",
                 inline=False
             )
-            embed.add_field(
-                name="`??clearwarns [@user]`",
-                value="Clears all warnings for the specified user.",
-                inline=False
-            )
 
-        # --- 2. CHANNEL MANAGEMENT ---
+        # --- 3. CHANNEL MANAGEMENT ---
         elif selection == "channels":
             embed = discord.Embed(
                 title="🌊 Channel Management",
@@ -123,7 +137,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 3. TICKET SYSTEM ---
+        # --- 4. TICKET SYSTEM ---
         elif selection == "tickets":
             embed = discord.Embed(
                 title="🎫 Ticket System",
@@ -146,7 +160,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 4. COMMUNITY & GAMES ---
+        # --- 5. COMMUNITY & GAMES ---
         elif selection == "games":
             embed = discord.Embed(
                 title="✨ Galaxy Community & Games",
@@ -169,7 +183,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 5. BUMP & REMINDERS ---
+        # --- 6. BUMP & REMINDERS ---
         elif selection == "bump":
             embed = discord.Embed(
                 title="🚀 Bump & Reminders",
@@ -207,7 +221,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 6. UTILITY & TOOLS ---
+        # --- 7. UTILITY & TOOLS ---
         elif selection == "utility":
             embed = discord.Embed(
                 title="🌙 Utility & Tools",
