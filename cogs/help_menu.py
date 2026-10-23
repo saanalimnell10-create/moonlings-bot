@@ -1,110 +1,148 @@
 import discord
 from discord.ext import commands
+from discord.ui import Select, View
 
-class HelpDropdown(discord.ui.Select):
+class HelpSelect(Select):
     def __init__(self):
         options = [
             discord.SelectOption(
-                label="Moderation & Transparency",
-                description="Warns with DM logs, kicks, and bans.",
-                emoji="🛡️"
-            ),
-            discord.SelectOption(
-                label="Channel Management",
-                description="Purge messages, lock and unlock channels.",
-                emoji="🌊"
+                label="General & Utility",
+                description="Basic server commands & utility tools",
+                emoji="⚙️",
+                value="general"
             ),
             discord.SelectOption(
                 label="Ticket System",
-                description="Support tickets and transcript logging.",
-                emoji="🎫"
+                description="Support ticket creation and management",
+                emoji="🎫",
+                value="tickets"
             ),
             discord.SelectOption(
-                label="Community & Games",
-                description="Truth or Dare and Chill Counting game.",
-                emoji="✨"
+                label="Moderation Suite",
+                description="Server moderation & safety tools",
+                emoji="🛡️",
+                value="moderation"
             ),
             discord.SelectOption(
-                label="Utility & Bumps",
-                description="AFK, stats, star bumps, and replies.",
-                emoji="🌙"
+                label="Games & Fun",
+                description="Chill Counting game",
+                emoji="🔢",
+                value="games"
             ),
         ]
-        super().__init__(placeholder="Select a category to explore~ 🌸", min_values=1, max_values=1, options=options)
+        super().__init__(
+            placeholder="Select a category to explore~ 🌸",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
 
     async def callback(self, interaction: discord.Interaction):
-        if self.values[0] == "Moderation & Transparency":
-            embed = discord.Embed(
-                title="🛡️ Moderation & Transparency",
-                description="Keeping Moonlings safe, cozy, and fair!",
-                color=0xFFB7C5
-            )
-            embed.add_field(name="??warn [@user] [reason]", value="Warns a member and automatically sends a transparent pastel DM log containing the moderator, reason, and a unique Case ID.", inline=False)
-            embed.add_field(name="??mute / ??unwarn / ??warnings", value="Mute rule-breakers or check warning history.", inline=False)
-            embed.add_field(name="??kick / ??ban", value="Standard safety tools to keep rule-breakers away.", inline=False)
+        selection = self.values[0]
 
-        elif self.values[0] == "Channel Management":
+        # --- 1. GENERAL & UTILITY ---
+        if selection == "general":
             embed = discord.Embed(
-                title="🌊 Channel Management",
-                description="Tools for keeping chat clean and controlled.",
-                color=0xB5EAD7
+                title="⚙️ General & Utility",
+                description="Essential commands for everyday server interactions.",
+                color=0xFFB6C1
             )
-            embed.add_field(name="??purge [amount]", value="Mass deletes messages from the channel.", inline=False)
-            embed.add_field(name="??lock / ??unlock", value="Locks or unlocks the current text channel.", inline=False)
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??help` – Opens this interactive help menu\n"
+                    "`??afk [reason]` – Sets your status to AFK with an optional custom reason\n"
+                    "`??ping` – Checks the bot's response latency"
+                ),
+                inline=False
+            )
 
-        elif self.values[0] == "Ticket System":
+        # --- 2. TICKET SYSTEM ---
+        elif selection == "tickets":
             embed = discord.Embed(
                 title="🎫 Ticket System",
-                description="Need help or want to talk to staff?",
-                color=0xFFDAC1
+                description="Need help or want to talk to staff? Open a ticket below!",
+                color=0xFFB6C1
             )
-            embed.add_field(name="Ticket Categories", value="Staff Complaint, Promo & Sponsorship, Giveaway Claim, and Staff Applications.", inline=False)
-            embed.add_field(name="Transcript Logs", value="Automatic text transcripts sent to `#ticket-logs` upon closure.", inline=False)
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??ticket` – Open a new support ticket\n"
+                    "`??close` – Close the current active ticket\n"
+                    "`??add [@user]` – Add a user to the ticket channel\n"
+                    "`??remove [@user]` – Remove a user from the ticket channel"
+                ),
+                inline=False
+            )
+            embed.add_field(
+                name="🏷️ Ticket Categories",
+                value="Staff Complaint, Promo & Sponsorship, Giveaway Claim, and Staff Applications",
+                inline=False
+            )
 
-        elif self.values[0] == "Community & Games":
+        # --- 3. MODERATION SUITE ---
+        elif selection == "moderation":
             embed = discord.Embed(
-                title="✨ Community & Games",
-                description="Fun activities for everyone!",
-                color=0xFFD1DC
+                title="🛡️ Moderation Suite",
+                description="Transparent moderation tools with automated DM logs and Case IDs.",
+                color=0xFFB6C1
             )
-            embed.add_field(name="??truth / ??dare / ??tod", value="Play Truth or Dare with friends.", inline=False)
-            embed.add_field(name="Chill Counting", value="Count together (`??setcounting`, `??resetcount`).", inline=False)
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??ban [@user] [reason]` – Bans a member from the server\n"
+                    "`??kick [@user] [reason]` – Kicks a member from the server\n"
+                    "`??mute [@user] [time] [reason]` – Temporarily mutes/timeouts a member\n"
+                    "`??clearwarns [@user]` – Clears all warnings for a user\n"
+                    "`??purge [amount]` – Purges specified amount of recent messages\n"
+                    "`??purgebots` – Deletes recent messages sent by bots\n"
+                    "`??hide` / `??lock` – Hides or locks the current channel"
+                ),
+                inline=False
+            )
 
-        elif self.values[0] == "Utility & Bumps":
+        # --- 4. GAMES & FUN ---
+        elif selection == "games":
             embed = discord.Embed(
-                title="🌙 Utility & Bumps",
-                description="Helpful tools and server boosts.",
-                color=0xC7CEEA
+                title="🔢 Games & Chill Suite",
+                description="Cozy games and interactive server activities.",
+                color=0xFFB6C1
             )
-            embed.add_field(name="??afk [reason]", value="Sets your AFK status with automatic nickname tagging.", inline=False)
-            embed.add_field(name="??vctop / ??stats", value="View activity stats and voice channel leaderboards.", inline=False)
-            embed.add_field(name="??bump / ??setbumpchannel", value="Star bumps reminder system for Disboard.", inline=False)
-            embed.add_field(name="??reply [message_id]", value="Reply directly to a specific message ID.", inline=False)
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??setcounting` – Set the current channel for the Chill Counting game"
+                ),
+                inline=False
+            )
 
         embed.set_footer(text="Moonlings Bot • Cozy Space & Sea Aesthetic 🌸")
-        await interaction.response.edit_message(embed=embed, view=self.view)
+        await interaction.response.edit_message(embed=embed)
 
-class HelpView(discord.ui.View):
+
+class HelpMenuView(View):
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(HelpDropdown())
+        self.add_item(HelpSelect())
 
-class HelpMenu(commands.Cog):
+
+class HelpMenuCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="help")
     async def help_command(self, ctx):
-        """Displays the interactive pastel help menu."""
         embed = discord.Embed(
-            title="🌙 Moonlings Help Menu 🌙",
-            description="Welcome to Moonlings! Choose a category from the dropdown menu below to explore our active features.",
-            color=0xFFB7C5
+            title="🌸 Moonlings Help Center",
+            description=(
+                "Welcome to **Moonlings**! Please select a category from the dropdown menu below "
+                "to explore all available commands and features."
+            ),
+            color=0xFFB6C1
         )
-        embed.set_footer(text="Made with love for cozy communities ✨")
-        
-        view = HelpView()
-        await ctx.send(embed=embed, view=view)
+        embed.set_footer(text="Moonlings Bot • Cozy Space & Sea Aesthetic 🌸")
+        await ctx.send(embed=embed, view=HelpMenuView())
+
 
 async def setup(bot):
-    await bot.add_cog(HelpMenu(bot))
+    await bot.add_cog(HelpMenuCog(bot))
