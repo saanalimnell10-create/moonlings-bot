@@ -12,6 +12,12 @@ class HelpSelect(Select):
                 value="moderation"
             ),
             discord.SelectOption(
+                label="Anti-Nuke & Anti-Raid",
+                description="Mass deletion limits, whitelist, and server lockdown.",
+                emoji="🚨",
+                value="antinuke"
+            ),
+            discord.SelectOption(
                 label="Audit Log & Event Logging",
                 description="Real-time event logging, channel tracking, and toggles.",
                 emoji="📜",
@@ -94,7 +100,27 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 2. AUDIT LOG & EVENT LOGGING ---
+        # --- 2. ANTI-NUKE & ANTI-RAID ---
+        elif selection == "antinuke":
+            embed = discord.Embed(
+                title="🚨 Anti-Nuke & Anti-Raid System",
+                description="Automated server protection, mass-join prevention, and lockdowns.",
+                color=0xFFB6C1
+            )
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??antinuke [on/off]` – Enables or disables Anti-Nuke protection.\n"
+                    "`??antiraid [on/off]` – Enables or disables automated Anti-Raid protection.\n"
+                    "`??whitelisted` – Views trusted staff members bypassed by Anti-Nuke.\n"
+                    "`??whitelist add/remove [@user]` – Adds or removes staff from the whitelist.\n"
+                    "`??lockdown` – Instantly locks all public channels in case of a raid.\n"
+                    "`??unlock` – Unlocks all public channels after the raid is cleared."
+                ),
+                inline=False
+            )
+
+        # --- 3. AUDIT LOG & EVENT LOGGING ---
         elif selection == "audit":
             embed = discord.Embed(
                 title="📜 Audit Log & Event Logging",
@@ -111,7 +137,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 3. CONFLICT & SAFETY SUITE ---
+        # --- 4. CONFLICT & SAFETY SUITE ---
         elif selection == "conflict":
             embed = discord.Embed(
                 title="🕊️ Conflict & Safety Suite",
@@ -129,7 +155,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 4. CUSTOM FAKE PERMISSIONS ---
+        # --- 5. CUSTOM FAKE PERMISSIONS ---
         elif selection == "fakeperms":
             embed = discord.Embed(
                 title="🔒 Custom Fake Permissions System",
@@ -147,11 +173,11 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 5. SERVER TOOLS ---
+        # --- 6. SERVER TOOLS ---
         elif selection == "servertools":
             embed = discord.Embed(
                 title="🛠️ Server Tools",
-                description="Handy tools for managing server assets and channels.",
+                description="Handy tools for managing server assets and channels (Staff only).",
                 color=0xFFB6C1
             )
             embed.add_field(
@@ -163,7 +189,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 6. CHANNEL MANAGEMENT ---
+        # --- 7. CHANNEL MANAGEMENT ---
         elif selection == "channels":
             embed = discord.Embed(
                 title="🌊 Channel Management",
@@ -180,7 +206,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 7. TICKET SYSTEM ---
+        # --- 8. TICKET SYSTEM ---
         elif selection == "tickets":
             embed = discord.Embed(
                 title="🎫 Ticket System",
@@ -198,7 +224,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 8. COMMUNITY & GAMES ---
+        # --- 9. COMMUNITY & GAMES ---
         elif selection == "games":
             embed = discord.Embed(
                 title="✨ Galaxy Community & Games",
@@ -215,7 +241,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 9. BUMP & REMINDERS ---
+        # --- 10. BUMP & REMINDERS ---
         elif selection == "bump":
             embed = discord.Embed(
                 title="🚀 Bump & Reminders",
@@ -235,7 +261,7 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 10. UTILITY & TOOLS ---
+        # --- 11. UTILITY & TOOLS ---
         elif selection == "utility":
             embed = discord.Embed(
                 title="🌙 Utility & Tools",
