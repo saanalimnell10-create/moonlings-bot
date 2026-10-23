@@ -30,8 +30,14 @@ class HelpSelect(Select):
                 value="games"
             ),
             discord.SelectOption(
-                label="Utility & Bumps",
-                description="AFK, voice stats, star bumps, and replies.",
+                label="Bump & Reminders",
+                description="Star bumps, roles, and custom message settings.",
+                emoji="🚀",
+                value="bump"
+            ),
+            discord.SelectOption(
+                label="Utility & Tools",
+                description="AFK, voice stats, and direct replies.",
                 emoji="🌙",
                 value="utility"
             ),
@@ -143,11 +149,49 @@ class HelpSelect(Select):
                 inline=False
             )
 
-        # --- 5. UTILITY & BUMPS ---
+        # --- 5. BUMP & REMINDERS ---
+        elif selection == "bump":
+            embed = discord.Embed(
+                title="🚀 Bump & Reminders",
+                description="Customizable Disboard bump system with reminders and thank-you messages.",
+                color=0xFFB6C1
+            )
+            embed.add_field(
+                name="`??bump`",
+                value="Logs a Disboard bump and starts the 2-hour reminder timer.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??bumptime`",
+                value="Checks how much cooldown time is left until the next bump.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??setbumpchannel [#channel]`",
+                value="Sets the channel for bump reminders and thank-you messages.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??setbumprole [@role]`",
+                value="Sets the role to be pinged during bump reminders.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??setbumpmsg [message]`",
+                value="Customizes the reminder message sent after 2 hours.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??setthanksmsg [message]`",
+                value="Customizes the thank-you message sent when someone bumps.",
+                inline=False
+            )
+
+        # --- 6. UTILITY & TOOLS ---
         elif selection == "utility":
             embed = discord.Embed(
-                title="🌙 Utility & Bumps",
-                description="Helpful tools and server bumps.",
+                title="🌙 Utility & Tools",
+                description="Handy tools and helpers for everyone in the cosmos~",
                 color=0xFFB6C1
             )
             embed.add_field(
@@ -158,11 +202,6 @@ class HelpSelect(Select):
             embed.add_field(
                 name="`??vctop`",
                 value="View voice channel time leaderboards.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??bump / ??bumptime / ??setbumpchannel`",
-                value="Star bumps reminder system for Disboard.",
                 inline=False
             )
             embed.add_field(
