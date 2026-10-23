@@ -7,7 +7,7 @@ class HelpSelect(Select):
         options = [
             discord.SelectOption(
                 label="Moderation & Transparency",
-                description="Warns with DM logs, kicks, and bans.",
+                description="Warns, bans, isolation tools, and forced nicknames.",
                 emoji="🛡️",
                 value="moderation"
             ),
@@ -56,7 +56,7 @@ class HelpSelect(Select):
         if selection == "moderation":
             embed = discord.Embed(
                 title="🛡️ Moderation & Transparency",
-                description="Transparent moderation tools with automated DM logs.",
+                description="Transparent moderation tools, conflict isolation, and safety suites.",
                 color=0xFFB6C1
             )
             embed.add_field(
@@ -72,6 +72,26 @@ class HelpSelect(Select):
             embed.add_field(
                 name="`??mute [@user] [time] [reason]`",
                 value="Temporarily mutes or timeouts a member.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??isolate [@user1] [@user2] [reason]`",
+                value="Isolates arguing members into a temporary private channel to settle things.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??endbeef [@user1] [@user2]`",
+                value="Ends the isolation and deletes the temporary private channel.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??forcename [@user] [nickname]`",
+                value="Forces a nickname on a member and automatically re-applies it if changed.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??forcename [@user] remove`",
+                value="Removes the forced nickname lock.",
                 inline=False
             )
             embed.add_field(
