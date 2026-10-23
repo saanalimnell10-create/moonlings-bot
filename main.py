@@ -5,13 +5,16 @@ import discord
 from discord.ext import commands
 from keep_alive import keep_alive
 
+# Tuodaan dynaaminen prefix-funktio prefix-cogista
+from cogs.prefix import get_prefix_for_guild
+
 # Asetetaan tarvittavat intentit (vaaditaan mm. viestien lukemiseen ja jäseniin)
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-# Luodaan botti-instanssi etuliitteellä ?? ja poistetaan oletushelp käytöstä
-bot = commands.Bot(command_prefix="??", intents=intents, help_command=None)
+# Luodaan botti-instanssi dynaamisella etuliitteellä ja poistetaan oletushelp käytöstä
+bot = commands.Bot(command_prefix=get_prefix_for_guild, intents=intents, help_command=None)
 
 @bot.event
 async def on_ready():
@@ -20,7 +23,7 @@ async def on_ready():
     print("Moonlings is online and cozy! 🌸✨")
 
 async def load_extensions():
-    """Lautaa automaattisesti kaikki cogs-kansion alaiset .py-tiedostot."""
+    """Lataa automaattisesti kaikki cogs-kansion alaiset .py-tiedostot."""
     if not os.path.exists("./cogs"):
         print("⚠️ Varoitus: 'cogs'-kansiota ei löytynyt!")
         return
