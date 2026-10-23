@@ -18,6 +18,12 @@ class HelpSelect(Select):
                 value="conflict"
             ),
             discord.SelectOption(
+                label="Custom Fake Permissions",
+                description="Manage safe role permissions without native admin rights.",
+                emoji="🔒",
+                value="fakeperms"
+            ),
+            discord.SelectOption(
                 label="Channel Management",
                 description="Purge messages, lock and unlock channels.",
                 emoji="🌊",
@@ -66,23 +72,13 @@ class HelpSelect(Select):
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??ban [@user] [reason]`",
-                value="Bans a member from the server with a transparent DM log.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??kick [@user] [reason]`",
-                value="Kicks a member from the server.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??mute [@user] [time] [reason]`",
-                value="Temporarily mutes or timeouts a member.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??clearwarns [@user]`",
-                value="Clears all warnings for the specified user.",
+                name="📜 Commands",
+                value=(
+                    "`??ban [@user] [reason]` – Bans a member from the server with a transparent DM log.\n"
+                    "`??kick [@user] [reason]` – Kicks a member from the server.\n"
+                    "`??mute [@user] [time] [reason]` – Temporarily mutes or timeouts a member.\n"
+                    "`??clearwarns [@user]` – Clears all warnings for the specified user."
+                ),
                 inline=False
             )
 
@@ -94,27 +90,35 @@ class HelpSelect(Select):
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??isolate [@user1] [@user2] [reason]`",
-                value="Isolates arguing members into a temporary private channel to settle things.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??endbeef [@user1] [@user2]`",
-                value="Ends the isolation and deletes the temporary private channel.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??forcename [@user] [nickname]`",
-                value="Forces a nickname on a member and automatically re-applies it if changed.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??forcename [@user] remove`",
-                value="Removes the forced nickname lock.",
+                name="📜 Commands",
+                value=(
+                    "`??isolate [@user1] [@user2] [reason]` – Isolates arguing members into a temporary private channel.\n"
+                    "`??endbeef [@user1] [@user2]` – Ends the isolation and deletes the temporary channel.\n"
+                    "`??forcename [@user] [nickname]` – Forces a nickname on a member and automatically re-applies it if changed.\n"
+                    "`??forcename [@user] remove` – Removes the forced nickname lock."
+                ),
                 inline=False
             )
 
-        # --- 3. CHANNEL MANAGEMENT ---
+        # --- 3. CUSTOM FAKE PERMISSIONS ---
+        elif selection == "fakeperms":
+            embed = discord.Embed(
+                title="🔒 Custom Fake Permissions System",
+                description="Safely grant bot command permissions to roles without Discord admin powers.",
+                color=0xFFB6C1
+            )
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??fakepermissions grant [@role] [permissions]` – Grants specific bot command permissions to a role.\n"
+                    "`??fakepermissions list [@role]` – Views all fake permissions granted to a specific role.\n"
+                    "`??fakepermissions remove [@role] [permissions]` – Revokes specific fake permissions from a role.\n"
+                    "`??fakepermissions reset [@role]` – Resets all fake permissions assigned to a role."
+                ),
+                inline=False
+            )
+
+        # --- 4. CHANNEL MANAGEMENT ---
         elif selection == "channels":
             embed = discord.Embed(
                 title="🌊 Channel Management",
@@ -122,22 +126,16 @@ class HelpSelect(Select):
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??purge [amount]`",
-                value="Mass deletes messages from the channel.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??purgebots`",
-                value="Deletes the latest messages sent by bots.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??lock / ??unlock`",
-                value="Locks or unlocks the current text channel.",
+                name="📜 Commands",
+                value=(
+                    "`??purge [amount]` – Mass deletes messages from the channel.\n"
+                    "`??purgebots` – Deletes the latest messages sent by bots.\n"
+                    "`??lock / ??unlock` – Locks or unlocks the current text channel."
+                ),
                 inline=False
             )
 
-        # --- 4. TICKET SYSTEM ---
+        # --- 5. TICKET SYSTEM ---
         elif selection == "tickets":
             embed = discord.Embed(
                 title="🎫 Ticket System",
@@ -145,22 +143,17 @@ class HelpSelect(Select):
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??ticket`",
-                value="Opens a new support ticket channel.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??close`",
-                value="Closes the current active ticket and saves a transcript.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??add [@user]` / `??remove [@user]`",
-                value="Adds or removes a user from the ticket.",
+                name="📜 Commands",
+                value=(
+                    "`??ticket` – Opens a new support ticket channel.\n"
+                    "`??close` – Closes the current active ticket and saves a transcript.\n"
+                    "`??add [@user]` – Adds a user to the ticket channel.\n"
+                    "`??remove [@user]` – Removes a user from the ticket channel."
+                ),
                 inline=False
             )
 
-        # --- 5. COMMUNITY & GAMES ---
+        # --- 6. COMMUNITY & GAMES ---
         elif selection == "games":
             embed = discord.Embed(
                 title="✨ Galaxy Community & Games",
@@ -168,22 +161,16 @@ class HelpSelect(Select):
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??setcounting` / `??resetcount`",
-                value="Start or reset the chill star-counting game.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??top [daily/weekly/all]` / `??messages [@user]`",
-                value="View message leaderboards or check a member's message count.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??tod` / `??truth` / `??dare`",
-                value="Play Truth or Dare with cute glowing buttons or space questions.",
+                name="📜 Commands",
+                value=(
+                    "`??setcounting` / `??resetcount` – Start or reset the chill star-counting game.\n"
+                    "`??top [daily/weekly/all]` / `??messages [@user]` – View message leaderboards or check message count.\n"
+                    "`??tod` / `??truth` / `??dare` – Play Truth or Dare with cute glowing buttons or space questions."
+                ),
                 inline=False
             )
 
-        # --- 6. BUMP & REMINDERS ---
+        # --- 7. BUMP & REMINDERS ---
         elif selection == "bump":
             embed = discord.Embed(
                 title="🚀 Bump & Reminders",
@@ -191,37 +178,19 @@ class HelpSelect(Select):
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??bump`",
-                value="Logs a Disboard bump and starts the 2-hour reminder timer.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??bumptime`",
-                value="Checks how much cooldown time is left until the next bump.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??setbumpchannel [#channel]`",
-                value="Sets the channel for bump reminders and thank-you messages.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??setbumprole [@role]`",
-                value="Sets the role to be pinged during bump reminders.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??setbumpmsg [message]`",
-                value="Customizes the reminder message sent after 2 hours.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??setthanksmsg [message]`",
-                value="Customizes the thank-you message sent when someone bumps.",
+                name="📜 Commands",
+                value=(
+                    "`??bump` – Logs a Disboard bump and starts the 2-hour reminder timer.\n"
+                    "`??bumptime` – Checks how much cooldown time is left until the next bump.\n"
+                    "`??setbumpchannel [#channel]` – Sets the channel for bump reminders and thank-you messages.\n"
+                    "`??setbumprole [@role]` – Sets the role to be pinged during bump reminders.\n"
+                    "`??setbumpmsg [message]` – Customizes the reminder message sent after 2 hours.\n"
+                    "`??setthanksmsg [message]` – Customizes the thank-you message sent when someone bumps."
+                ),
                 inline=False
             )
 
-        # --- 7. UTILITY & TOOLS ---
+        # --- 8. UTILITY & TOOLS ---
         elif selection == "utility":
             embed = discord.Embed(
                 title="🌙 Utility & Tools",
@@ -229,18 +198,12 @@ class HelpSelect(Select):
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??afk [reason]`",
-                value="Sets your AFK status with automatic nickname tagging.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??vctop`",
-                value="View voice channel time leaderboards.",
-                inline=False
-            )
-            embed.add_field(
-                name="`??reply [message_id]`",
-                value="Reply directly to a specific message ID.",
+                name="📜 Commands",
+                value=(
+                    "`??afk [reason]` – Sets your AFK status with automatic nickname tagging.\n"
+                    "`??vctop` – View voice channel time leaderboards.\n"
+                    "`??reply [message_id]` – Reply directly to a specific message ID."
+                ),
                 inline=False
             )
 
