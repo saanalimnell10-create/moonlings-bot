@@ -22,7 +22,7 @@ class ChannelManagement(commands.Cog):
         except discord.Forbidden:
             await ctx.send("❌ I don't have permissions to manage permissions in this channel.", delete_after=5)
 
-    @commands.command(name="unlockchannel")
+    @commands.command(name="unlock")
     @commands.has_permissions(manage_channels=True)
     async def unlock_channel(self, ctx):
         """Unlocks the current channel, restoring regular messaging permissions."""
