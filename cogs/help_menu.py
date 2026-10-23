@@ -4,15 +4,18 @@ from discord.ext import commands
 class HelpSelect(discord.ui.Select):
     def __init__(self):
         options = [
+            discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
+            discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="🛡️"),
             discord.SelectOption(label="Channel Management", description="Lock, unlock, purge, and slowmode commands", emoji="🌊"),
             discord.SelectOption(label="Security & Anti-Nuke", description="Anti-nuke, anti-raid, and whitelist settings", emoji="🚨"),
             discord.SelectOption(label="Tickets", description="Support ticket panel and management commands", emoji="🎫"),
             discord.SelectOption(label="Staff Applications", description="Staff apply panel and application controls", emoji="🌸"),
-            discord.SelectOption(label="Moderation & Advanced Mod", description="Warn, kick, ban, isolate, force-name", emoji="🔨"),
-            discord.SelectOption(label="Audit Logs & Bump System", description="Log channels and bump reminders", emoji="📜"),
+            discord.SelectOption(label="Bump System", description="Configure bump tracking and reminders", emoji="💥"),
+            discord.SelectOption(label="Server Tools", description="Emoji steal and channel cloning tools", emoji="🧰"),
+            discord.SelectOption(label="Games", description="Counting game, Truth or Dare, and TOD commands", emoji="🎮"),
+            discord.SelectOption(label="Audit Logs", description="Configure server event logging", emoji="📜"),
             discord.SelectOption(label="Stats & AFK", description="Activity tracking and AFK status", emoji="📊"),
-            discord.SelectOption(label="Games & Server Tools", description="Truth or Dare, emoji steal, and clone", emoji="🎮"),
-            discord.SelectOption(label="Counting & Fake Perms", description="Counting game and custom role permissions", emoji="🔢"),
+            discord.SelectOption(label="Fake Permissions", description="Custom role-based permissions setup", emoji="🔑"),
         ]
         super().__init__(placeholder="Select a category to view commands...", min_values=1, max_values=1, options=options)
 
@@ -21,7 +24,33 @@ class HelpSelect(discord.ui.Select):
         embed = discord.Embed(color=discord.Color.from_rgb(230, 210, 240))
         embed.set_footer(text="Moonlings Help Desk 🌸")
 
-        if selected == "Channel Management":
+        if selected == "Moderation":
+            embed.title = "🔨 Moderation Tools"
+            embed.description = "Essential server moderation commands."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??warn [@user] [reason]` - Issues a warning to a member.\n"
+                    "`??kick [@user] [reason]` - Kicks a member from the server.\n"
+                    "`??ban [@user] [reason]` - Bans a member from the server."
+                ),
+                inline=False
+            )
+
+        elif selected == "Safety":
+            embed.title = "🛡️ Safety & Advanced Moderation"
+            embed.description = "Advanced user isolation and restriction tools."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??isolate [@user]` - Isolates a user from text channels.\n"
+                    "`??endbeef [@user]` - Ends the isolation for a user.\n"
+                    "`??forcename [@user] [name]` - Enforces a specific nickname on a user."
+                ),
+                inline=False
+            )
+
+        elif selected == "Channel Management":
             embed.title = "🌊 Channel Management Tools"
             embed.description = "Manage channel permissions, cleanup, and slowmode."
             embed.add_field(
@@ -77,33 +106,53 @@ class HelpSelect(discord.ui.Select):
                 inline=False
             )
 
-        elif selected == "Moderation & Advanced Mod":
-            embed.title = "🔨 Moderation & Advanced Controls"
-            embed.description = "Standard moderation and user isolation tools."
+        elif selected == "Bump System":
+            embed.title = "💥 Bump System"
+            embed.description = "Track bumps and set reminder notifications."
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??warn [@user] [reason]` - Issues a warning to a member.\n"
-                    "`??kick [@user] [reason]` - Kicks a member from the server.\n"
-                    "`??ban [@user] [reason]` - Bans a member from the server.\n"
-                    "`??isolate [@user]` - Isolates a user from text channels.\n"
-                    "`??endbeef [@user]` - Ends the isolation for a user.\n"
-                    "`??forcename [@user] [name]` - Enforces a specific nickname on a user."
+                    "`??setbumpchannel [#channel]` - Sets the bump tracking channel.\n"
+                    "`??setbumprole [@role]` - Sets the role to ping for bumps.\n"
+                    "`??bumptime` - Checks time remaining until next bump."
                 ),
                 inline=False
             )
 
-        elif selected == "Audit Logs & Bump System":
-            embed.title = "📜 Audit Logs & Bump Reminders"
-            embed.description = "Configure event logging and bump tracking."
+        elif selected == "Server Tools":
+            embed.title = "🧰 Server Tools"
+            embed.description = "Utility tools for emojis and channels."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??steal [emoji/url]` - Steals an emoji to the server.\n"
+                    "`??clone [#channel]` - Clones an existing channel."
+                ),
+                inline=False
+            )
+
+        elif selected == "Games":
+            embed.title = "🎮 Games"
+            embed.description = "Fun games including Counting and Truth or Dare."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??setcounting [#channel]` - Sets up the counting channel.\n"
+                    "`??truth` - Gets a random Truth question.\n"
+                    "`??dare` - Gets a random Dare challenge.\n"
+                    "`??tod` - Asks to choose Truth or Dare."
+                ),
+                inline=False
+            )
+
+        elif selected == "Audit Logs":
+            embed.title = "📜 Audit Logs"
+            embed.description = "Server logging configuration."
             embed.add_field(
                 name="📜 Commands",
                 value=(
                     "`??setlogs [#channel]` - Sets the audit logging channel.\n"
-                    "`??togglelogs` - Toggles server event logging on/off.\n"
-                    "`??setbumpchannel [#channel]` - Sets the bump tracking channel.\n"
-                    "`??setbumprole [@role]` - Sets the role to ping for bumps.\n"
-                    "`??bumptime` - Checks time remaining until next bump."
+                    "`??togglelogs` - Toggles server event logging on/off."
                 ),
                 inline=False
             )
@@ -123,28 +172,12 @@ class HelpSelect(discord.ui.Select):
                 inline=False
             )
 
-        elif selected == "Games & Server Tools":
-            embed.title = "🎮 Games & Server Tools"
-            embed.description = "Fun games and emoji management."
+        elif selected == "Fake Permissions":
+            embed.title = "🔑 Fake Permissions"
+            embed.description = "Configure custom role permissions."
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??truth` - Gets a random Truth question.\n"
-                    "`??dare` - Gets a random Dare challenge.\n"
-                    "`??tod` - Asks to choose Truth or Dare.\n"
-                    "`??steal [emoji/url]` - Steals an emoji to the server.\n"
-                    "`??clone [#channel]` - Clones an existing channel."
-                ),
-                inline=False
-            )
-
-        elif selected == "Counting & Fake Perms":
-            embed.title = "🔢 Counting Game & Fake Permissions"
-            embed.description = "Counting channel setup and custom command permissions."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    "`??setcounting [#channel]` - Sets up the counting game channel.\n"
                     "`??grantperm [@role] [perm]` - Grants custom permission to a role.\n"
                     "`??removeperm [@role] [perm]` - Removes custom permission from a role.\n"
                     "`??listperms` - Lists custom role permission settings.\n"
