@@ -25,13 +25,13 @@ class HelpSelect(Select):
             ),
             discord.SelectOption(
                 label="Community & Games",
-                description="Chill Counting game.",
+                description="Truth or Dare, counting game, and message stats.",
                 emoji="✨",
                 value="games"
             ),
             discord.SelectOption(
                 label="Utility & Bumps",
-                description="AFK and general utilities.",
+                description="AFK, voice stats, star bumps, and replies.",
                 emoji="🌙",
                 value="utility"
             ),
@@ -123,13 +123,23 @@ class HelpSelect(Select):
         # --- 4. COMMUNITY & GAMES ---
         elif selection == "games":
             embed = discord.Embed(
-                title="✨ Community & Games",
-                description="Fun activities and cozy server games.",
+                title="✨ Galaxy Community & Games",
+                description="Let's giggle, count shooting stars, and play together! ☁️✨",
                 color=0xFFB6C1
             )
             embed.add_field(
-                name="`??setcounting`",
-                value="Sets up the channel for the Chill Counting game.",
+                name="`??setcounting` / `??resetcount`",
+                value="Start or reset the chill star-counting game.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??top [daily/weekly/all]` / `??messages [@user]`",
+                value="View message leaderboards or check a member's message count.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??tod` / `??truth` / `??dare`",
+                value="Play Truth or Dare with cute glowing buttons or space questions.",
                 inline=False
             )
 
@@ -137,17 +147,27 @@ class HelpSelect(Select):
         elif selection == "utility":
             embed = discord.Embed(
                 title="🌙 Utility & Bumps",
-                description="AFK and general utilities.",
+                description="Helpful tools and server bumps.",
                 color=0xFFB6C1
             )
             embed.add_field(
                 name="`??afk [reason]`",
-                value="Sets your status to AFK with an optional reason.",
+                value="Sets your AFK status with automatic nickname tagging.",
                 inline=False
             )
             embed.add_field(
-                name="`??ping`",
-                value="Checks the bot's response latency.",
+                name="`??vctop`",
+                value="View voice channel time leaderboards.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??bump / ??bumptime / ??setbumpchannel`",
+                value="Star bumps reminder system for Disboard.",
+                inline=False
+            )
+            embed.add_field(
+                name="`??reply [message_id]`",
+                value="Reply directly to a specific message ID.",
                 inline=False
             )
 
