@@ -6,8 +6,9 @@ class HelpSelect(discord.ui.Select):
         options = [
             discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
             discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="🛡️"),
+            discord.SelectOption(label="Threat Security", description="Dynamic pressure tracking, toggles, and modes", emoji="🚨"),
+            discord.SelectOption(label="Security & Anti-Nuke", description="Anti-nuke, anti-raid, and whitelist settings", emoji="🔒"),
             discord.SelectOption(label="Channel Management", description="Lock, unlock, purge, and slowmode commands", emoji="🌊"),
-            discord.SelectOption(label="Security & Anti-Nuke", description="Anti-nuke, anti-raid, and whitelist settings", emoji="🚨"),
             discord.SelectOption(label="Tickets", description="Support ticket panel and management commands", emoji="🎫"),
             discord.SelectOption(label="Staff Applications", description="Staff apply panel and application controls", emoji="🌸"),
             discord.SelectOption(label="Bump System", description="Configure bump tracking and reminders", emoji="💥"),
@@ -24,7 +25,35 @@ class HelpSelect(discord.ui.Select):
         embed = discord.Embed(color=discord.Color.from_rgb(230, 210, 240))
         embed.set_footer(text="Moonlings Help Desk 🌸")
 
-        if selected == "Moderation":
+        if selected == "Threat Security":
+            embed.title = "🚨 Dynamic Threat Security System"
+            embed.description = "Automated pressure tracking and dynamic threat mode controls."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??threatlevel` - Views current threat score, active gear, and security status.\n"
+                    "`??setthreatmode [mode]` - Overrides security mode (auto/normal/elevated/lockdown).\n"
+                    "`??togglethreat [on/off]` - Toggles the dynamic threat monitoring system on or off."
+                ),
+                inline=False
+            )
+
+        elif selected == "Security & Anti-Nuke":
+            embed.title = "🔒 Security & Anti-Nuke"
+            embed.description = "General protection, anti-nuke, anti-raid, and whitelist controls."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??antinuke [on/off]` - Toggle Anti-Nuke protection.\n"
+                    "`??antiraid [on/off]` - Toggle Anti-Raid protection.\n"
+                    "`??whitelist add [@user]` - Add a user to anti-nuke whitelist.\n"
+                    "`??whitelist remove [@user]` - Remove a user from whitelist.\n"
+                    "`??whitelisted` - Show whitelisted staff members."
+                ),
+                inline=False
+            )
+
+        elif selected == "Moderation":
             embed.title = "🔨 Moderation Tools"
             embed.description = "Essential server moderation commands."
             embed.add_field(
@@ -60,21 +89,6 @@ class HelpSelect(discord.ui.Select):
                     "`??unlock` - Unlocks the current channel.\n"
                     "`??purge [amount]` - Delete a specified number of messages.\n"
                     "`??slowmode [time]` - Set a custom slowmode delay."
-                ),
-                inline=False
-            )
-
-        elif selected == "Security & Anti-Nuke":
-            embed.title = "🚨 Security & Anti-Nuke Suite"
-            embed.description = "Protect your server with anti-nuke, anti-raid, and whitelist controls."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    "`??antinuke [on/off]` - Toggle Anti-Nuke protection.\n"
-                    "`??antiraid [on/off]` - Toggle Anti-Raid protection.\n"
-                    "`??whitelist add [@user]` - Add a user to anti-nuke whitelist.\n"
-                    "`??whitelist remove [@user]` - Remove a user from whitelist.\n"
-                    "`??whitelisted` - Show whitelisted staff members."
                 ),
                 inline=False
             )
