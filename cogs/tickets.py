@@ -1,3 +1,6 @@
+import discord
+from discord.ext import commands
+
 class TicketSelect(discord.ui.Select):
     def __init__(self):
         options = [
@@ -17,8 +20,8 @@ class TicketSelect(discord.ui.Select):
         user = interaction.user
         category_name = self.values[0]
 
-        channel_name = f"ticket-{user.name}".lower()
-        # Siivotaan erikoismerkit kanavan nimestä, ettei tule virheitä
+        # Luodaan uniikki kanavanimi käyttäjän nimen ja ID:n perusteella
+        channel_name = f"ticket-{user.name}-{user.id}".lower()
         channel_name = "".join(c for c in channel_name if c.isalnum() or c == "-")
         
         existing_channel = discord.utils.get(guild.text_channels, name=channel_name)
@@ -36,8 +39,83 @@ class TicketSelect(discord.ui.Select):
         
         embed = discord.Embed(
             title=f"🎫 Tiketti: {category_name}",
-            description=f"Hei {user.mention}! Ylläpito vastaa sinulle pian.\n\n**Komennot:**\n• `??close` - Sulkee tiketin ja luo transcriptin\n• `??add @käyttäjä` - Lisää käyttäjän\n• `??remove @käyttäjä` - Poistaa käyttäjän\n• `??block @käyttäjä` - Estää pääsyn",
-            color=discord.Color.purple()
+            description=f"Hei {user.mention}! Ylläpito vastaa sinulle pian.\n\n**Komennot:**\n• `??close` - Sulkee tiketin\n• `??add @käyttäjä` - Lisää käyttäjän\n• `??remove @käyttäjä` - Poistaa käyttäjän\n• `??block @käyttäjä` - Estää pääsyn",
+            color=discord.Color.from_rgb(230, 210, 240)
         )
+        embed.set_footer(text="Moonlings Ticket System 🌸")
         await channel.send(embed=embed)
         await interaction.response.send_message(f"Tiketti luotu: {channel.mention}", ephemeral=True)
+
+class TicketView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.add_item(TicketSelect())
+
+class Tickets(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(name="ticketpanel")
+    @commands.has_permissions(administrator=True)
+    async def ticket_panel(self, ctx):
+        """Sends the support ticket panel with a drop-down menu."""
+        await ctx.message.delete()
+        embed = discord.Embed(
+            title="🎫 Moonlings Support & Tickets",
+            description="Tarvitsetko apua, haluatko tehdä kumppanuuden tai ilmoittaa jostain? Valitse alta sopiva aihe avataksesi tiketin! 🌸",
+            color=discord.Color.from_rgb(230, 210, 240)
+        )
+        embed.set_footer(text="Moonlings Ticket System 🌸")
+        await ctx.send(embed=embed, view=TicketView())
+
+    @commands.command(name="close")
+    async def close_ticket(self, ctx):
+        """Closes the active ticket channel."""
+        if not ctx.channel.name.startswith("ticket-"):
+            await ctx.send("❌ Tätä komentoa voi käyttää vain tikettikanavilla!", delete_after=5)
+            return
+
+        embed = discord.Embed(
+            title="🔒 Tiketti suljetaan",
+            description="Tämä kanava poistetaan 5 sekunnin kuluttua...",
+            color=discord.Color.from_rgb(255, 182, 193)
+        )
+        embed.set_footer(text="Moonlings Ticket System 🌸")
+        await ctx.send(embed=embed)
+        await ctx.channel.delete(delay=5)
+
+    @commands.command(name="add")
+    @commands.has_permissions(manage_channels=True)
+    async def add_user(self, ctx, member: discord.Member):
+        """Adds a user to the active ticket channel."""
+        await ctx.message.delete()
+        if not ctx.channel.name.startswith("ticket-"):
+            await ctx.send("❌ Tätä komentoa voi käyttää vain tikettikanavilla!", delete_after=5)
+            return
+        await ctx.channel.set_permissions(member, read_messages=True, send_messages=True)
+        await ctx.send(f"✨ {member.mention} on lisätty tikettiin.")
+
+    @commands.command(name="remove")
+    @commands.has_permissions(manage_channels=True)
+    async def remove_user(self, ctx, member: discord.Member):
+        """Removes a user from the active ticket channel."""
+        await ctx.message.delete()
+        if not ctx.channel.name.startswith("ticket-"):
+            await ctx.send("❌ Tätä komentoa voi käyttää vain tikettikanavilla!", delete_after=5)
+            return
+        await ctx.channel.set_permissions(member, overwrite=None)
+        await ctx.send(f"🛡️ {member.mention} on poistettu tiketistä.")
+
+    @commands.command(name="block")
+    @commands.has_permissions(manage_channels=True)
+    async def block_user(self, ctx, member: discord.Member):
+        """Blocks a user from viewing the ticket channel."""
+        await ctx.message.delete()
+        if not ctx.channel.name.startswith("ticket-"):
+            await ctx.send("❌ Tätä komentoa voi käyttää vain tikettikanavilla!", delete_after=5)
+            return
+        await ctx.channel.set_permissions(member, read_messages=False)
+        await ctx.send(f"🚫 {member.mention} on estetty tässä tiketissä.")
+
+async def setup(bot):
+    await bot.add_cog(Tickets(bot))
