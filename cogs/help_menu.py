@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 
 class HelpSelect(discord.ui.Select):
-    def __init__(self):
+    def __init__(self, prefix):
+        self.prefix = prefix
         options = [
             discord.SelectOption(label="Welcome & Goodbye", description="Configure custom welcome and goodbye messages", emoji="👋"),
             discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
@@ -23,6 +24,7 @@ class HelpSelect(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         selected = self.values[0]
+        p = self.prefix
         embed = discord.Embed(color=discord.Color.from_rgb(230, 210, 240))
         embed.set_footer(text="Moonlings Help Desk 🌸")
 
@@ -32,10 +34,10 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??setwelcomechannel [#channel]` - Sets the welcome message channel.\n"
-                    "`??setwelcometext <text>` - Sets custom welcome text (Use `{user}` & `{server}`).\n"
-                    "`??setgoodbyechannel [#channel]` - Sets the goodbye message channel.\n"
-                    "`??setgoodbyetext <text>` - Sets custom goodbye text (Use `{user}` & `{server}`)."
+                    f"`{p}setwelcomechannel [#channel]` - Sets the welcome message channel.\n"
+                    f"`{p}setwelcometext <text>` - Sets custom welcome text (Use `{{user}}` & `{{server}}`).\n"
+                    f"`{p}setgoodbyechannel [#channel]` - Sets the goodbye message channel.\n"
+                    f"`{p}setgoodbyetext <text>` - Sets custom goodbye text (Use `{{user}}` & `{{server}}`)."
                 ),
                 inline=False
             )
@@ -46,9 +48,9 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??threatlevel` - Views current threat score, active gear, and security status.\n"
-                    "`??setthreatmode [mode]` - Overrides security mode (auto/normal/elevated/lockdown).\n"
-                    "`??togglethreat [on/off]` - Toggles the dynamic threat monitoring system on or off."
+                    f"`{p}threatlevel` - Views current threat score, active gear, and security status.\n"
+                    f"`{p}setthreatmode [mode]` - Overrides security mode (auto/normal/elevated/lockdown).\n"
+                    f"`{p}togglethreat [on/off]` - Toggles the dynamic threat monitoring system on or off."
                 ),
                 inline=False
             )
@@ -59,11 +61,11 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??antinuke [on/off]` - Toggle Anti-Nuke protection.\n"
-                    "`??antiraid [on/off]` - Toggle Anti-Raid protection.\n"
-                    "`??whitelist add [@user]` - Add a user to anti-nuke whitelist.\n"
-                    "`??whitelist remove [@user]` - Remove a user from whitelist.\n"
-                    "`??whitelisted` - Show whitelisted staff members."
+                    f"`{p}antinuke [on/off]` - Toggle Anti-Nuke protection.\n"
+                    f"`{p}antiraid [on/off]` - Toggle Anti-Raid protection.\n"
+                    f"`{p}whitelist add [@user]` - Add a user to anti-nuke whitelist.\n"
+                    f"`{p}whitelist remove [@user]` - Remove a user from whitelist.\n"
+                    f"`{p}whitelisted` - Show whitelisted staff members."
                 ),
                 inline=False
             )
@@ -74,9 +76,9 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??warn [@user] [reason]` - Issues a warning to a member.\n"
-                    "`??kick [@user] [reason]` - Kicks a member from the server.\n"
-                    "`??ban [@user] [reason]` - Bans a member from the server."
+                    f"`{p}warn [@user] [reason]` - Issues a warning to a member.\n"
+                    f"`{p}kick [@user] [reason]` - Kicks a member from the server.\n"
+                    f"`{p}ban [@user] [reason]` - Bans a member from the server."
                 ),
                 inline=False
             )
@@ -87,9 +89,9 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??isolate [@user]` - Isolates a user from text channels.\n"
-                    "`??endbeef [@user]` - Ends the isolation for a user.\n"
-                    "`??forcename [@user] [name]` - Enforces a specific nickname on a user."
+                    f"`{p}isolate [@user]` - Isolates a user from text channels.\n"
+                    f"`{p}endbeef [@user]` - Ends the isolation for a user.\n"
+                    f"`{p}forcename [@user] [name]` - Enforces a specific nickname on a user."
                 ),
                 inline=False
             )
@@ -100,10 +102,10 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??lock [reason]` - Locks the current channel.\n"
-                    "`??unlock` - Unlocks the current channel.\n"
-                    "`??purge [amount]` - Delete a specified number of messages.\n"
-                    "`??slowmode [time]` - Set a custom slowmode delay."
+                    f"`{p}lock [reason]` - Locks the current channel.\n"
+                    f"`{p}unlock` - Unlocks the current channel.\n"
+                    f"`{p}purge [amount]` - Delete a specified number of messages.\n"
+                    f"`{p}slowmode [time]` - Set a custom slowmode delay."
                 ),
                 inline=False
             )
@@ -114,11 +116,11 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??ticketpanel` - Sends the ticket creation panel (Admin).\n"
-                    "`??close` - Closes the active ticket channel.\n"
-                    "`??add [@user]` - Adds a user to the ticket.\n"
-                    "`??remove [@user]` - Removes a user from the ticket.\n"
-                    "`??block [@user]` - Blocks a user from the ticket."
+                    f"`{p}ticketpanel` - Sends the ticket creation panel (Admin).\n"
+                    f"`{p}close` - Closes the active ticket channel.\n"
+                    f"`{p}add [@user]` - Adds a user to the ticket.\n"
+                    f"`{p}remove [@user]` - Removes a user from the ticket.\n"
+                    f"`{p}block [@user]` - Blocks a user from the ticket."
                 ),
                 inline=False
             )
@@ -129,8 +131,8 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??staffapplypanel` - Sends the staff application panel (Admin).\n"
-                    "`??applyclose` - Closes the application and generates a transcript."
+                    f"`{p}staffapplypanel` - Sends the staff application panel (Admin).\n"
+                    f"`{p}applyclose` - Closes the application and generates a transcript."
                 ),
                 inline=False
             )
@@ -141,9 +143,9 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??setbumpchannel [#channel]` - Sets the bump tracking channel.\n"
-                    "`??setbumprole [@role]` - Sets the role to ping for bumps.\n"
-                    "`??bumptime` - Checks time remaining until next bump."
+                    f"`{p}setbumpchannel [#channel]` - Sets the bump tracking channel.\n"
+                    f"`{p}setbumprole [@role]` - Sets the role to ping for bumps.\n"
+                    f"`{p}bumptime` - Checks time remaining until next bump."
                 ),
                 inline=False
             )
@@ -154,8 +156,8 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??steal [emoji/url]` - Steals an emoji to the server.\n"
-                    "`??clone [#channel]` - Clones an existing channel."
+                    f"`{p}steal [emoji/url]` - Steals an emoji to the server.\n"
+                    f"`{p}clone [#channel]` - Clones an existing channel."
                 ),
                 inline=False
             )
@@ -166,10 +168,10 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??setcounting [#channel]` - Sets up the counting channel.\n"
-                    "`??truth` - Gets a random Truth question.\n"
-                    "`??dare` - Gets a random Dare challenge.\n"
-                    "`??tod` - Asks to choose Truth or Dare."
+                    f"`{p}setcounting [#channel]` - Sets up the counting channel.\n"
+                    f"`{p}truth` - Gets a random Truth question.\n"
+                    f"`{p}dare` - Gets a random Dare challenge.\n"
+                    f"`{p}tod` - Asks to choose Truth or Dare."
                 ),
                 inline=False
             )
@@ -180,8 +182,8 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??setlogs [#channel]` - Sets the audit logging channel.\n"
-                    "`??togglelogs` - Toggles server event logging on/off."
+                    f"`{p}setlogs [#channel]` - Sets the audit logging channel.\n"
+                    f"`{p}togglelogs` - Toggles server event logging on/off."
                 ),
                 inline=False
             )
@@ -192,11 +194,11 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??afk [reason]` - Sets your status as AFK.\n"
-                    "`??topmessages` - Shows leaderboard for most active text users.\n"
-                    "`??checkmessages [@user]` - Shows message stats for a user.\n"
-                    "`??vctop` - Shows leaderboard for voice channel activity.\n"
-                    "`??resetstats` - Resets stats tracking data (Admin)."
+                    f"`{p}afk [reason]` - Sets your status as AFK.\n"
+                    f"`{p}topmessages` - Shows leaderboard for most active text users.\n"
+                    f"`{p}checkmessages [@user]` - Shows message stats for a user.\n"
+                    f"`{p}vctop` - Shows leaderboard for voice channel activity.\n"
+                    f"`{p}resetstats` - Resets stats tracking data (Admin)."
                 ),
                 inline=False
             )
@@ -207,10 +209,10 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    "`??grantperm [@role] [perm]` - Grants custom permission to a role.\n"
-                    "`??removeperm [@role] [perm]` - Removes custom permission from a role.\n"
-                    "`??listperms` - Lists custom role permission settings.\n"
-                    "`??resetperms` - Resets all fake permission settings."
+                    f"`{p}grantperm [@role] [perm]` - Grants custom permission to a role.\n"
+                    f"`{p}removeperm [@role] [perm]` - Removes custom permission from a role.\n"
+                    f"`{p}listperms` - Lists custom role permission settings.\n"
+                    f"`{p}resetperms` - Resets all fake permission settings."
                 ),
                 inline=False
             )
@@ -218,13 +220,16 @@ class HelpSelect(discord.ui.Select):
         await interaction.response.edit_message(embed=embed)
 
 class HelpView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=300)  # Asetettu tasan 5 minuuttiin (300 sekuntia)
-        self.add_item(HelpSelect())
+    def __init__(self, prefix):
+        super().__init__(timeout=300)
+        self.add_item(HelpSelect(prefix))
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        # Poistetaan botin oletus-help komento, jotta tämä uusi mahtuu tilalle!
+        if self.bot.help_command:
+            self.bot.help_command = None
 
     @commands.command(name="help")
     async def help_command(self, ctx):
@@ -238,11 +243,13 @@ class Help(commands.Cog):
             
         embed = discord.Embed(
             title="🌸 Moonlings Bot Help Menu",
-            description="Welcome to Moonlings! Please select a category from the dropdown menu below to view available commands.",
+            description=f"Welcome to Moonlings! Please select a category from the dropdown menu below to view available commands.\nCurrent Prefix: `{ctx.prefix}`",
             color=discord.Color.from_rgb(230, 210, 240)
         )
         embed.set_footer(text="Moonlings Help Desk 🌸")
-        await ctx.send(embed=embed, view=HelpView())
+        await ctx.send(embed=embed, view=HelpView(ctx.prefix))
 
 async def setup(bot):
+    # Poistetaan vanha help-komento botilta ennen cogin lisäämistä
+    bot.remove_command("help")
     await bot.add_cog(Help(bot))
