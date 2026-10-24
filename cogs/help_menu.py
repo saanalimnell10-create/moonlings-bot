@@ -4,6 +4,7 @@ from discord.ext import commands
 class HelpSelect(discord.ui.Select):
     def __init__(self):
         options = [
+            discord.SelectOption(label="Welcome & Goodbye", description="Configure custom welcome and goodbye messages", emoji="👋"),
             discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
             discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="🛡️"),
             discord.SelectOption(label="Threat Security", description="Dynamic pressure tracking, toggles, and modes", emoji="🚨"),
@@ -25,7 +26,21 @@ class HelpSelect(discord.ui.Select):
         embed = discord.Embed(color=discord.Color.from_rgb(230, 210, 240))
         embed.set_footer(text="Moonlings Help Desk 🌸")
 
-        if selected == "Threat Security":
+        if selected == "Welcome & Goodbye":
+            embed.title = "👋 Welcome & Goodbye System"
+            embed.description = "Configure custom welcome and goodbye messages, channels, and placeholders."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    "`??setwelcomechannel [#channel]` - Sets the welcome message channel.\n"
+                    "`??setwelcometext <text>` - Sets custom welcome text (Use `{user}` & `{server}`).\n"
+                    "`??setgoodbyechannel [#channel]` - Sets the goodbye message channel.\n"
+                    "`??setgoodbyetext <text>` - Sets custom goodbye text (Use `{user}` & `{server}`)."
+                ),
+                inline=False
+            )
+
+        elif selected == "Threat Security":
             embed.title = "🚨 Dynamic Threat Security System"
             embed.description = "Automated pressure tracking and dynamic threat mode controls."
             embed.add_field(
@@ -214,7 +229,13 @@ class Help(commands.Cog):
     @commands.command(name="help")
     async def help_command(self, ctx):
         """Displays the interactive Moonlings help menu."""
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            pass
+        except discord.HTTPException:
+            pass
+            
         embed = discord.Embed(
             title="🌸 Moonlings Bot Help Menu",
             description="Welcome to Moonlings! Please select a category from the dropdown menu below to view available commands.",
