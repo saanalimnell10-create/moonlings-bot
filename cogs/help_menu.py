@@ -219,7 +219,7 @@ class HelpSelect(discord.ui.Select):
 
 class HelpView(discord.ui.View):
     def __init__(self):
-        super().__init__(timeout=None)
+        super().__init__(timeout=300)  # Asetettu tasan 5 minuuttiin (300 sekuntia)
         self.add_item(HelpSelect())
 
 class Help(commands.Cog):
