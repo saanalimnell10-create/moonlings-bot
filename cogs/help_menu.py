@@ -6,6 +6,7 @@ class HelpSelect(discord.ui.Select):
         self.prefix = prefix
         options = [
             discord.SelectOption(label="Welcome & Goodbye", description="Configure custom welcome and goodbye messages", emoji="👋"),
+            discord.SelectOption(label="Cozy Café", description="Brew hot drinks, bake pastries, and serve friends", emoji="🍵"),
             discord.SelectOption(label="Member Protection", description="Watchlist and user protection suite", emoji="🛡️"),
             discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
             discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="⚔️"),
@@ -39,6 +40,20 @@ class HelpSelect(discord.ui.Select):
                     f"`{p}setwelcometext <text>` - Sets custom welcome text (Use `{{user}}` & `{{server}}`).\n"
                     f"`{p}setgoodbyechannel [#channel]` - Sets the goodbye message channel.\n"
                     f"`{p}setgoodbyetext <text>` - Sets custom goodbye text (Use `{{user}}` & `{{server}}`)."
+                ),
+                inline=False
+            )
+
+        elif selected == "Cozy Café":
+            embed.title = "🍵 Cozy Café & Teahouse Mini-Economy"
+            embed.description = "Brew, bake, and serve cozy treats to your friends!"
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}brew [drink]` - Brews a cozy hot drink (Matcha, Latte, etc.).\n"
+                    f"`{p}bake [pastry]` - Bakes a sweet treat (Shortcake, Cookie, etc.).\n"
+                    f"`{p}serve [@user] [item]` - Serves an item from your pantry to a friend!\n"
+                    f"`{p}pantry [@user]` - Displays personal cafe items and inventory."
                 ),
                 inline=False
             )
@@ -247,4 +262,24 @@ class Help(commands.Cog):
         if self.bot.help_command:
             self.bot.help_command = None
 
-    @commands.command(name
+    @commands.command(name="help")
+    async def help_command(self, ctx):
+        """Displays the interactive Moonlings help menu."""
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            pass
+        except discord.HTTPException:
+            pass
+            
+        embed = discord.Embed(
+            title="🌸 Moonlings Bot Help Menu",
+            description=f"Welcome to Moonlings! Please select a category from the dropdown menu below to view available commands.\nCurrent Prefix: `{ctx.prefix}`",
+            color=discord.Color.from_rgb(230, 210, 240)
+        )
+        embed.set_footer(text="Moonlings Help Desk 🌸")
+        await ctx.send(embed=embed, view=HelpView(ctx.prefix))
+
+async def setup(bot):
+    bot.remove_command("help")
+    await bot.add_cog(Help(bot))
