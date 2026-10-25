@@ -6,8 +6,9 @@ class HelpSelect(discord.ui.Select):
         self.prefix = prefix
         options = [
             discord.SelectOption(label="Welcome & Goodbye", description="Configure custom welcome and goodbye messages", emoji="👋"),
+            discord.SelectOption(label="Member Protection", description="Watchlist and user protection suite", emoji="🛡️"),
             discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
-            discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="🛡️"),
+            discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="⚔️"),
             discord.SelectOption(label="Threat Security", description="Dynamic pressure tracking, toggles, and modes", emoji="🚨"),
             discord.SelectOption(label="Security & Anti-Nuke", description="Anti-nuke, anti-raid, and whitelist settings", emoji="🔒"),
             discord.SelectOption(label="Channel Management", description="Lock, unlock, purge, and slowmode commands", emoji="🌊"),
@@ -38,6 +39,20 @@ class HelpSelect(discord.ui.Select):
                     f"`{p}setwelcometext <text>` - Sets custom welcome text (Use `{{user}}` & `{{server}}`).\n"
                     f"`{p}setgoodbyechannel [#channel]` - Sets the goodbye message channel.\n"
                     f"`{p}setgoodbyetext <text>` - Sets custom goodbye text (Use `{{user}}` & `{{server}}`)."
+                ),
+                inline=False
+            )
+
+        elif selected == "Member Protection":
+            embed.title = "🛡️ Member Protection & Watchlist System"
+            embed.description = "Track, mark, and protect server members from harassers or unwanted users."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}setupboycott setup [#channel]` - Set alert channel for flags.\n"
+                    f"`{p}setupboycott mark [@user] [reason]` - Mark a user on the watchlist.\n"
+                    f"`{p}setupboycott unmark [@user]` - Remove a user from the watchlist.\n"
+                    f"`{p}setupboycott list` - List all currently marked users."
                 ),
                 inline=False
             )
@@ -84,7 +99,7 @@ class HelpSelect(discord.ui.Select):
             )
 
         elif selected == "Safety":
-            embed.title = "🛡️ Safety & Advanced Moderation"
+            embed.title = "⚔️ Safety & Advanced Moderation"
             embed.description = "Advanced user isolation and restriction tools."
             embed.add_field(
                 name="📜 Commands",
@@ -227,7 +242,6 @@ class HelpView(discord.ui.View):
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # Poistetaan botin oletus-help komento, jotta tämä uusi mahtuu tilalle!
         if self.bot.help_command:
             self.bot.help_command = None
 
@@ -250,6 +264,5 @@ class Help(commands.Cog):
         await ctx.send(embed=embed, view=HelpView(ctx.prefix))
 
 async def setup(bot):
-    # Poistetaan vanha help-komento botilta ennen cogin lisäämistä
     bot.remove_command("help")
     await bot.add_cog(Help(bot))
