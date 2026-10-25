@@ -7,7 +7,6 @@ class HelpSelect(discord.ui.Select):
         options = [
             discord.SelectOption(label="Welcome & Goodbye", description="Configure custom welcome and goodbye messages", emoji="👋"),
             discord.SelectOption(label="Member Protection", description="Watchlist and user protection suite", emoji="🛡️"),
-            discord.SelectOption(label="Games", description="Counting game, custom emojis, and Truth or Dare", emoji="🎮"),
             discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
             discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="⚔️"),
             discord.SelectOption(label="Threat Security", description="Dynamic pressure tracking, toggles, and modes", emoji="🚨"),
@@ -17,6 +16,7 @@ class HelpSelect(discord.ui.Select):
             discord.SelectOption(label="Staff Applications", description="Staff apply panel and application controls", emoji="🌸"),
             discord.SelectOption(label="Bump System", description="Configure bump tracking and reminders", emoji="💥"),
             discord.SelectOption(label="Server Tools", description="Emoji steal and channel cloning tools", emoji="🧰"),
+            discord.SelectOption(label="Games", description="Counting game, custom emojis, and Truth or Dare", emoji="🎮"),
             discord.SelectOption(label="Audit Logs", description="Configure server event logging", emoji="📜"),
             discord.SelectOption(label="Stats & AFK", description="Activity tracking and AFK status", emoji="📊"),
             discord.SelectOption(label="Fake Permissions", description="Custom role-based permissions setup", emoji="🔑"),
@@ -53,22 +53,6 @@ class HelpSelect(discord.ui.Select):
                     f"`{p}setupboycott mark [@user] [reason]` - Mark a user on the watchlist.\n"
                     f"`{p}setupboycott unmark [@user]` - Remove a user from the watchlist.\n"
                     f"`{p}setupboycott list` - List all currently marked users."
-                ),
-                inline=False
-            )
-
-        elif selected == "Games":
-            embed.title = "🎮 Games & Counting System"
-            embed.description = "Fun games including Counting with custom emojis, Truth or Dare."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}setcounting [#channel]` - Sets up the counting channel.\n"
-                    f"`{p}setcountingemoji success <emoji>` - Sets custom success emoji.\n"
-                    f"`{p}setcountingemoji fail <emoji>` - Sets custom fail emoji.\n"
-                    f"`{p}truth` - Gets a random Truth question.\n"
-                    f"`{p}dare` - Gets a random Dare challenge.\n"
-                    f"`{p}tod` - Asks to choose Truth or Dare."
                 ),
                 inline=False
             )
@@ -193,6 +177,22 @@ class HelpSelect(discord.ui.Select):
                 inline=False
             )
 
+        elif selected == "Games":
+            embed.title = "🎮 Games & Counting System"
+            embed.description = "Fun games including Counting with custom emojis, Truth or Dare."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}setcounting [#channel]` - Sets up the counting channel.\n"
+                    f"`{p}setcountingemoji success <emoji>` - Sets custom success emoji.\n"
+                    f"`{p}setcountingemoji fail <emoji>` - Sets custom fail emoji.\n"
+                    f"`{p}truth` - Gets a random Truth question.\n"
+                    f"`{p}dare` - Gets a random Dare challenge.\n"
+                    f"`{p}tod` - Asks to choose Truth or Dare."
+                ),
+                inline=False
+            )
+
         elif selected == "Audit Logs":
             embed.title = "📜 Audit Logs"
             embed.description = "Server logging configuration."
@@ -222,7 +222,7 @@ class HelpSelect(discord.ui.Select):
 
         elif selected == "Fake Permissions":
             embed.title = "🔑 Fake Permissions"
-            embed.description = "Configure custom role permissions."
+            embed.description = "Custom role-based permissions setup."
             embed.add_field(
                 name="📜 Commands",
                 value=(
@@ -247,24 +247,4 @@ class Help(commands.Cog):
         if self.bot.help_command:
             self.bot.help_command = None
 
-    @commands.command(name="help")
-    async def help_command(self, ctx):
-        """Displays the interactive Moonlings help menu."""
-        try:
-            await ctx.message.delete()
-        except discord.Forbidden:
-            pass
-        except discord.HTTPException:
-            pass
-            
-        embed = discord.Embed(
-            title="🌸 Moonlings Bot Help Menu",
-            description=f"Welcome to Moonlings! Please select a category from the dropdown menu below to view available commands.\nCurrent Prefix: `{ctx.prefix}`",
-            color=discord.Color.from_rgb(230, 210, 240)
-        )
-        embed.set_footer(text="Moonlings Help Desk 🌸")
-        await ctx.send(embed=embed, view=HelpView(ctx.prefix))
-
-async def setup(bot):
-    bot.remove_command("help")
-    await bot.add_cog(Help(bot))
+    @commands.command(name
