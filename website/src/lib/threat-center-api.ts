@@ -24,6 +24,18 @@ export type ThreatStatus = {
   recentEvents: Array<{ id?: string; message: string; at?: string }>;
 };
 
+export type WelcomeSettings = {
+  welcomeChannelId: string | null;
+  welcomeText: string;
+  goodbyeChannelId: string | null;
+  goodbyeText: string;
+};
+
+export type WelcomeChannel = {
+  id: string;
+  name: string;
+};
+
 async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
@@ -52,4 +64,24 @@ export function getThreatStatus(guildId: string) {
 
 export function logoutDiscord() {
   return apiRequest<{ ok: boolean }>("/api/auth/discord/logout", { method: "POST" });
+}
+
+export function getWelcomeChannels(guildId: string) {
+  return apiRequest<{ guild: AdminGuild; channels: WelcomeChannel[] }>(
+    "/api/welcome/channels?" + new URLSearchParams({ guildId }),
+  );
+}
+
+export function getWelcomeSettings(guildId: string) {
+  return apiRequest<{ guild: AdminGuild; settings: WelcomeSettings }>(
+    "/api/welcome/settings?" + new URLSearchParams({ guildId }),
+  );
+}
+
+export function saveWelcomeSettings(guildId: string, settings: WelcomeSettings) {
+  return apiRequest<{ ok: boolean }>("/api/welcome/settings", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ guildId, ...settings }),
+  });
 }

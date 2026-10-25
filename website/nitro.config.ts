@@ -9,5 +9,7 @@ export default defineConfig({
     authSessionSecret: "",
     botStatusApiUrl: "",
     botStatusApiToken: "",
+    botControlApiUrl: "",
+    botControlApiToken: "",
   },
 });

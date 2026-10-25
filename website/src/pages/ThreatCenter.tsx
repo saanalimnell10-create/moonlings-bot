@@ -16,7 +16,7 @@ export default function ThreatCenter() {
   return <main className="threat-page">
     <header className="site-header threat-header">
       <Link className="brand" to="/"><span className="brand-mark"><span>☾</span><i /></span><span>moonlings</span></Link>
-      <nav className="nav-links threat-nav"><Link to="/">Why Moonlings</Link><Link to="/#commands">Commands</Link><a href="#safety-actions">Safety tools</a><Link className="threat-nav-active" to="/threat-center">Threat Center</Link></nav>
+      <nav className="nav-links threat-nav"><Link to="/">Why Moonlings</Link><Link to="/#commands">Commands</Link><a href="#safety-actions">Safety tools</a><Link to="/welcome">Welcome &amp; Goodbye</Link><Link className="threat-nav-active" to="/threat-center">Threat Center</Link></nav>
       <Link className="header-invite" to="/">Back to home <ArrowLeft size={15}/></Link>
     </header>
 
