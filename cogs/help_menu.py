@@ -10,18 +10,18 @@ class HelpSelect(discord.ui.Select):
             discord.SelectOption(label="Member Protection", description="Watchlist and user protection suite", emoji="🛡️"),
             discord.SelectOption(label="Threat Security", description="Dynamic pressure tracking, toggles, and modes", emoji="🚨"),
             discord.SelectOption(label="Security & Anti-Nuke", description="Anti-nuke, anti-raid, and whitelist settings", emoji="🔒"),
+            discord.SelectOption(label="Fake Permissions", description="Custom role-based permissions setup", emoji="🔑"),
+            discord.SelectOption(label="Audit Logs", description="Configure server event logging", emoji="📜"),
+            discord.SelectOption(label="Server Tools", description="Emoji steal and channel cloning tools", emoji="🧰"),
+            discord.SelectOption(label="Staff Applications", description="Staff apply panel and application controls", emoji="🌸"),
+            discord.SelectOption(label="Channel Management", description="Lock, unlock, purge, and slowmode commands", emoji="🌊"),
+            discord.SelectOption(label="Tickets", description="Support ticket panel and management commands", emoji="🎫"),
             discord.SelectOption(label="Welcome & Goodbye", description="Configure custom welcome and goodbye messages", emoji="👋"),
             discord.SelectOption(label="Cozy Café", description="Brew hot drinks, bake pastries, and serve friends", emoji="🍵"),
             discord.SelectOption(label="Star Family", description="Marriage, adoption, family tree, and love ship", emoji="💍"),
             discord.SelectOption(label="Games & Fun", description="Counting, Truth or Dare, and Rock Paper Scissors", emoji="🎮"),
-            discord.SelectOption(label="Channel Management", description="Lock, unlock, purge, and slowmode commands", emoji="🌊"),
-            discord.SelectOption(label="Tickets", description="Support ticket panel and management commands", emoji="🎫"),
-            discord.SelectOption(label="Staff Applications", description="Staff apply panel and application controls", emoji="🌸"),
             discord.SelectOption(label="Bump System", description="Configure bump tracking and reminders", emoji="💥"),
-            discord.SelectOption(label="Server Tools", description="Emoji steal and channel cloning tools", emoji="🧰"),
-            discord.SelectOption(label="Audit Logs", description="Configure server event logging", emoji="📜"),
             discord.SelectOption(label="Stats & AFK", description="Activity tracking and AFK status", emoji="📊"),
-            discord.SelectOption(label="Fake Permissions", description="Custom role-based permissions setup", emoji="🔑"),
         ]
         super().__init__(placeholder="Select a category to view commands...", min_values=1, max_values=1, options=options)
 
@@ -99,6 +99,85 @@ class HelpSelect(discord.ui.Select):
                 inline=False
             )
 
+        elif selected == "Fake Permissions":
+            embed.title = "🔑 Fake Permissions"
+            embed.description = "Custom role-based permissions setup."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}grantperm [@role] [perm]` - Grants custom permission to a role.\n"
+                    f"`{p}removeperm [@role] [perm]` - Removes custom permission from a role.\n"
+                    f"`{p}listperms` - Lists custom role permission settings.\n"
+                    f"`{p}resetperms` - Resets all fake permission settings."
+                ),
+                inline=False
+            )
+
+        elif selected == "Audit Logs":
+            embed.title = "📜 Audit Logs"
+            embed.description = "Server logging configuration."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}setlogs [#channel]` - Sets the audit logging channel.\n"
+                    f"`{p}togglelogs` - Toggles server event logging on/off."
+                ),
+                inline=False
+            )
+
+        elif selected == "Server Tools":
+            embed.title = "🧰 Server Tools"
+            embed.description = "Utility tools for emojis and channels."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}steal [emoji/url]` - Steals an emoji to the server.\n"
+                    f"`{p}clone [#channel]` - Clones an existing channel."
+                ),
+                inline=False
+            )
+
+        elif selected == "Staff Applications":
+            embed.title = "🌸 Staff Applications"
+            embed.description = "Apply for staff and manage applications."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}staffapplypanel` - Sends the staff application panel (Admin).\n"
+                    f"`{p}applyclose` - Closes the application and generates a transcript."
+                ),
+                inline=False
+            )
+
+        elif selected == "Channel Management":
+            embed.title = "🌊 Channel Management Tools"
+            embed.description = "Manage channel permissions, cleanup, and slowmode."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}lock [reason]` - Locks the current channel.\n"
+                    f"`{p}unlock` - Unlocks the current channel.\n"
+                    f"`{p}purge [amount]` - Delete a specified number of messages.\n"
+                    f"`{p}slowmode [time]` - Set a custom slowmode delay."
+                ),
+                inline=False
+            )
+
+        elif selected == "Tickets":
+            embed.title = "🎫 Support Tickets"
+            embed.description = "Open and manage support tickets."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}ticketpanel` - Sends the ticket creation panel (Admin).\n"
+                    f"`{p}close` - Closes the active ticket channel.\n"
+                    f"`{p}add [@user]` - Adds a user to the ticket.\n"
+                    f"`{p}remove [@user]` - Removes a user from the ticket.\n"
+                    f"`{p}block [@user]` - Blocks a user from the ticket."
+                ),
+                inline=False
+            )
+
         elif selected == "Welcome & Goodbye":
             embed.title = "👋 Welcome & Goodbye System"
             embed.description = "Configure custom welcome and goodbye messages, channels, and placeholders."
@@ -159,47 +238,6 @@ class HelpSelect(discord.ui.Select):
                 inline=False
             )
 
-        elif selected == "Channel Management":
-            embed.title = "🌊 Channel Management Tools"
-            embed.description = "Manage channel permissions, cleanup, and slowmode."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}lock [reason]` - Locks the current channel.\n"
-                    f"`{p}unlock` - Unlocks the current channel.\n"
-                    f"`{p}purge [amount]` - Delete a specified number of messages.\n"
-                    f"`{p}slowmode [time]` - Set a custom slowmode delay."
-                ),
-                inline=False
-            )
-
-        elif selected == "Tickets":
-            embed.title = "🎫 Support Tickets"
-            embed.description = "Open and manage support tickets."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}ticketpanel` - Sends the ticket creation panel (Admin).\n"
-                    f"`{p}close` - Closes the active ticket channel.\n"
-                    f"`{p}add [@user]` - Adds a user to the ticket.\n"
-                    f"`{p}remove [@user]` - Removes a user from the ticket.\n"
-                    f"`{p}block [@user]` - Blocks a user from the ticket."
-                ),
-                inline=False
-            )
-
-        elif selected == "Staff Applications":
-            embed.title = "🌸 Staff Applications"
-            embed.description = "Apply for staff and manage applications."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}staffapplypanel` - Sends the staff application panel (Admin).\n"
-                    f"`{p}applyclose` - Closes the application and generates a transcript."
-                ),
-                inline=False
-            )
-
         elif selected == "Bump System":
             embed.title = "💥 Bump System"
             embed.description = "Track bumps and set reminder notifications."
@@ -209,30 +247,6 @@ class HelpSelect(discord.ui.Select):
                     f"`{p}setbumpchannel [#channel]` - Sets the bump tracking channel.\n"
                     f"`{p}setbumprole [@role]` - Sets the role to ping for bumps.\n"
                     f"`{p}bumptime` - Checks time remaining until next bump."
-                ),
-                inline=False
-            )
-
-        elif selected == "Server Tools":
-            embed.title = "🧰 Server Tools"
-            embed.description = "Utility tools for emojis and channels."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}steal [emoji/url]` - Steals an emoji to the server.\n"
-                    f"`{p}clone [#channel]` - Clones an existing channel."
-                ),
-                inline=False
-            )
-
-        elif selected == "Audit Logs":
-            embed.title = "📜 Audit Logs"
-            embed.description = "Server logging configuration."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}setlogs [#channel]` - Sets the audit logging channel.\n"
-                    f"`{p}togglelogs` - Toggles server event logging on/off."
                 ),
                 inline=False
             )
@@ -248,20 +262,6 @@ class HelpSelect(discord.ui.Select):
                     f"`{p}checkmessages [@user]` - Shows message stats for a user.\n"
                     f"`{p}vctop` - Shows leaderboard for voice channel activity.\n"
                     f"`{p}resetstats` - Resets stats tracking data (Admin)."
-                ),
-                inline=False
-            )
-
-        elif selected == "Fake Permissions":
-            embed.title = "🔑 Fake Permissions"
-            embed.description = "Custom role-based permissions setup."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}grantperm [@role] [perm]` - Grants custom permission to a role.\n"
-                    f"`{p}removeperm [@role] [perm]` - Removes custom permission from a role.\n"
-                    f"`{p}listperms` - Lists custom role permission settings.\n"
-                    f"`{p}resetperms` - Resets all fake permission settings."
                 ),
                 inline=False
             )
