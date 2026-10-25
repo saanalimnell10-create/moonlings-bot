@@ -2,11 +2,15 @@ import { useMemo, useState } from "react";
 import { ArrowDown, ArrowRight, Bot, Check, ChevronRight, Command, Copy, Gamepad2, Heart, Menu, Search, Shield, Sparkles, Star, X } from "lucide-react";
 
 const inviteUrl = "https://discord.com/oauth2/authorize?client_id=1562025850755616870&permissions=8&integration_type=0&scope=bot";
-const categories = ["All commands", "Moderation", "Anti-Nuke & Anti-Raid", "Threat Security", "Audit Logs", "Conflict Suite", "Custom Fake Permissions", "Channel Management", "Ticket System", "Community Games", "Bump & Reminders", "Server Stats", "Utility & Tools", "Staff Applications", "Prefix Settings", "Server Tools"];
+const categories = ["All commands", "Welcome & Goodbye", "Moderation", "Anti-Nuke & Anti-Raid", "Threat Security", "Audit Logs", "Conflict Suite", "Custom Fake Permissions", "Channel Management", "Ticket System", "Community Games", "Bump & Reminders", "Server Stats", "Utility & Tools", "Staff Applications", "Prefix Settings", "Server Tools"];
 const commands = [
   { name: "warn", category: "Moderation", syntax: "??warn [@member] [reason]", description: "Issue a warning to a member and record the reason.", icon: Shield },
   { name: "kick", category: "Moderation", syntax: "??kick [@member] [reason]", description: "Kick a member from the server.", icon: Shield },
   { name: "ban", category: "Moderation", syntax: "??ban [@member] [reason]", description: "Ban a member from the server.", icon: Shield },
+  { name: "setwelcomechannel", category: "Welcome & Goodbye", syntax: "??setwelcomechannel [#channel]", description: "Choose where new-member welcome messages are posted (administrator only).", icon: Sparkles },
+  { name: "setwelcometext", category: "Welcome & Goodbye", syntax: "??setwelcometext [text]", description: "Customize the welcome message. Use {user} and {server} as placeholders (administrator only).", icon: Sparkles },
+  { name: "setgoodbyechannel", category: "Welcome & Goodbye", syntax: "??setgoodbyechannel [#channel]", description: "Choose where member departure messages are posted (administrator only).", icon: Sparkles },
+  { name: "setgoodbyetext", category: "Welcome & Goodbye", syntax: "??setgoodbyetext [text]", description: "Customize the goodbye message. Use {user} and {server} as placeholders (administrator only).", icon: Sparkles },
   { name: "antinuke", category: "Anti-Nuke & Anti-Raid", syntax: "??antinuke [on/off]", description: "Enable or disable Anti-Nuke protection.", icon: Shield },
   { name: "antiraid", category: "Anti-Nuke & Anti-Raid", syntax: "??antiraid [on/off]", description: "Enable or disable automated Anti-Raid protection.", icon: Shield },
   { name: "whitelist", category: "Anti-Nuke & Anti-Raid", syntax: "??whitelist", description: "Open the whitelist command group for trusted staff management.", icon: Shield },
@@ -101,7 +105,7 @@ const Index = () => {
         <a className="brand" href="#home" aria-label="Moonlings home"><span className="brand-mark"><span>☾</span><i /></span><span>moonlings</span></a>
         <button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen ? <X size={20} /> : <Menu size={20} />}</button>
         <nav className={menuOpen ? "nav-links nav-open" : "nav-links"}>
-          <a href="#features" onClick={() => setMenuOpen(false)}>Why Moonlings</a><a href="#commands" onClick={() => setMenuOpen(false)}>Commands</a><a href="#footer" onClick={() => setMenuOpen(false)}>Community</a>
+          <a href="#features" onClick={() => setMenuOpen(false)}>Why Moonlings</a><a href="#commands" onClick={() => setMenuOpen(false)}>Commands</a><a href="/threat-center" onClick={() => setMenuOpen(false)}>Threat Center</a><a href="/bot" onClick={() => setMenuOpen(false)}>Bot Dashboard</a><a href="#footer" onClick={() => setMenuOpen(false)}>Community</a>
         </nav>
         <a className="header-invite" href={inviteUrl} target="_blank" rel="noreferrer">Invite bot <ArrowRight size={15} /></a>
       </header>
