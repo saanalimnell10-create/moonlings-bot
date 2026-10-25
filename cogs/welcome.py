@@ -2,21 +2,39 @@ import discord
 from discord.ext import commands
 import json
 import os
+from threading import RLock
 
 SETTINGS_FILE = "welcome_settings.json"
+SETTINGS_LOCK = RLock()
 
-def load_settings():
+def _read_settings():
     if os.path.exists(SETTINGS_FILE):
         try:
-            with open(SETTINGS_FILE, "r") as f:
+            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             return {}
     return {}
 
-def save_settings(settings):
-    with open(SETTINGS_FILE, "w") as f:
+def _write_settings(settings):
+    temporary_file = SETTINGS_FILE + ".tmp"
+    with open(temporary_file, "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=4)
+    os.replace(temporary_file, SETTINGS_FILE)
+
+def load_settings():
+    with SETTINGS_LOCK:
+        return _read_settings()
+
+def save_settings(settings):
+    with SETTINGS_LOCK:
+        _write_settings(settings)
+
+def update_guild_settings(guild_id, values):
+    with SETTINGS_LOCK:
+        settings = _read_settings()
+        settings.setdefault(str(guild_id), {}).update(values)
+        _write_settings(settings)
 
 class Welcome(commands.Cog):
     def __init__(self, bot):
@@ -47,7 +65,7 @@ class Welcome(commands.Cog):
                 if member.avatar:
                     embed.set_thumbnail(url=member.avatar.url)
                 embed.set_footer(text="Moonlings Welcome System 🌸")
-                await channel.send(embed=embed)
+                await channel.send(embed=embed, allowed_mentions=discord.AllowedMentions(users=[member], roles=False, everyone=False, replied_user=False))
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -71,58 +89,38 @@ class Welcome(commands.Cog):
                     color=discord.Color.from_rgb(240, 210, 210)
                 )
                 embed.set_footer(text="Moonlings Goodbye System 🌸")
-                await channel.send(embed=embed)
+                await channel.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(name="setwelcomechannel")
     @commands.has_permissions(administrator=True)
     async def set_welcome_channel(self, ctx, channel: discord.TextChannel):
         """Sets the channel for welcome messages."""
-        settings = load_settings()
         guild_id = str(ctx.guild.id)
-        if guild_id not in settings:
-            settings[guild_id] = {}
-        
-        settings[guild_id]["welcome_channel"] = channel.id
-        save_settings(settings)
+        update_guild_settings(guild_id, {"welcome_channel": channel.id})
         await ctx.send(f"🌸 Welcome channel set to {channel.mention}!")
 
     @commands.command(name="setwelcometext")
     @commands.has_permissions(administrator=True)
     async def set_welcome_text(self, ctx, *, text: str):
         """Sets the custom welcome message. Use {user} and {server}."""
-        settings = load_settings()
         guild_id = str(ctx.guild.id)
-        if guild_id not in settings:
-            settings[guild_id] = {}
-        
-        settings[guild_id]["welcome_text"] = text
-        save_settings(settings)
+        update_guild_settings(guild_id, {"welcome_text": text})
         await ctx.send(f"✨ Welcome text updated to:\n`{text}`")
 
     @commands.command(name="setgoodbyechannel")
     @commands.has_permissions(administrator=True)
     async def set_goodbye_channel(self, ctx, channel: discord.TextChannel):
         """Sets the channel for goodbye messages."""
-        settings = load_settings()
         guild_id = str(ctx.guild.id)
-        if guild_id not in settings:
-            settings[guild_id] = {}
-        
-        settings[guild_id]["goodbye_channel"] = channel.id
-        save_settings(settings)
+        update_guild_settings(guild_id, {"goodbye_channel": channel.id})
         await ctx.send(f"🌸 Goodbye channel set to {channel.mention}!")
 
     @commands.command(name="setgoodbyetext")
     @commands.has_permissions(administrator=True)
     async def set_goodbye_text(self, ctx, *, text: str):
         """Sets the custom goodbye message. Use {user} and {server}."""
-        settings = load_settings()
         guild_id = str(ctx.guild.id)
-        if guild_id not in settings:
-            settings[guild_id] = {}
-        
-        settings[guild_id]["goodbye_text"] = text
-        save_settings(settings)
+        update_guild_settings(guild_id, {"goodbye_text": text})
         await ctx.send(f"✨ Goodbye text updated to:\n`{text}`")
 
 async def setup(bot):
