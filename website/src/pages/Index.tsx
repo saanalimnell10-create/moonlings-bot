@@ -105,7 +105,7 @@ const Index = () => {
         <a className="brand" href="#home" aria-label="Moonlings home"><span className="brand-mark"><span>☾</span><i /></span><span>moonlings</span></a>
         <button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen ? <X size={20} /> : <Menu size={20} />}</button>
         <nav className={menuOpen ? "nav-links nav-open" : "nav-links"}>
-          <a href="#features" onClick={() => setMenuOpen(false)}>Why Moonlings</a><a href="#commands" onClick={() => setMenuOpen(false)}>Commands</a><a href="/threat-center" onClick={() => setMenuOpen(false)}>Threat Center</a><a href="/bot" onClick={() => setMenuOpen(false)}>Bot Dashboard</a><a href="#footer" onClick={() => setMenuOpen(false)}>Community</a>
+          <a href="#features" onClick={() => setMenuOpen(false)}>Why Moonlings</a><a href="#commands" onClick={() => setMenuOpen(false)}>Commands</a><a href="/threat-center" onClick={() => setMenuOpen(false)}>Threat Center</a><a href="#footer" onClick={() => setMenuOpen(false)}>Community</a>
         </nav>
         <a className="header-invite" href={inviteUrl} target="_blank" rel="noreferrer">Invite bot <ArrowRight size={15} /></a>
       </header>

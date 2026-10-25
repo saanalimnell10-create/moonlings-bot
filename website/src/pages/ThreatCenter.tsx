@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole, RefreshCw, Shield, Sparkles, Waves } from "lucide-react";
 import LiveStatusPanel from "@/components/threat-center/LiveStatusPanel";
+import SafetyQuickActions from "@/components/threat-center/SafetyQuickActions";
 import ThreatMoon from "@/components/threat-center/ThreatMoon";
 import "../threat-center.css";
 
@@ -15,12 +16,12 @@ export default function ThreatCenter() {
   return <main className="threat-page">
     <header className="site-header threat-header">
       <Link className="brand" to="/"><span className="brand-mark"><span>☾</span><i /></span><span>moonlings</span></Link>
-      <nav className="nav-links threat-nav"><Link to="/">Why Moonlings</Link><Link to="/#commands">Commands</Link><Link to="/bot">Bot Dashboard</Link><Link className="threat-nav-active" to="/threat-center">Threat Center</Link></nav>
+      <nav className="nav-links threat-nav"><Link to="/">Why Moonlings</Link><Link to="/#commands">Commands</Link><a href="#safety-actions">Safety tools</a><Link className="threat-nav-active" to="/threat-center">Threat Center</Link></nav>
       <Link className="header-invite" to="/">Back to home <ArrowLeft size={15}/></Link>
     </header>
 
     <section className="threat-hero">
-      <div className="threat-hero-content"><span className="eyebrow"><Sparkles size={14}/> A CALMER KIND OF SECURITY</span><h1>Know your waters.<br/><em>Keep your community safe.</em></h1><p>A gentle overview of Moonlings threat tools, a safe sample to explore, and a private live dashboard for server administrators.</p><div className="threat-hero-actions"><a href="#live-status" className="threat-button">Live server status <ArrowRight size={16}/></a><a href="#demo" className="threat-text-link">Explore the demo <Waves size={15}/></a></div></div>
+      <div className="threat-hero-content"><span className="eyebrow"><Sparkles size={14}/> A CALMER KIND OF SECURITY</span><h1>Know your waters.<br/><em>Keep your community safe.</em></h1><p>A secure live dashboard, helpful Discord safety shortcuts, and a safe sample to explore.</p><div className="threat-hero-actions"><a href="#live-status" className="threat-button">Live server status <ArrowRight size={16}/></a><a href="#safety-actions" className="threat-text-link">Safety tools <Shield size={15}/></a><a href="#demo" className="threat-text-link">Explore the demo <Waves size={15}/></a></div></div>
       <div className="threat-orbit-art" aria-hidden="true"><span className="threat-orbit-ring"/><span className="threat-moon">☾</span><span className="threat-art-star star-a">✦</span><span className="threat-art-star star-b">✧</span><span className="threat-art-bubble">🪼</span></div>
     </section>
 
@@ -28,6 +29,11 @@ export default function ThreatCenter() {
       <div className="threat-section-heading"><div><span className="eyebrow"><LockKeyhole size={13}/> PRIVATE TO YOUR SERVER</span><h2>Live server status</h2><p>Real data, scoped to a server you administer. This dashboard is read-only.</p></div></div>
       <LiveStatusPanel />
       <div className="live-help-row"><span><Shield size={16}/> Need Moonlings in your server?</span><a href={inviteUrl} target="_blank" rel="noreferrer">Invite Moonlings <ArrowRight size={14}/></a><span className="live-help-note">Only servers where you have administrator or Manage Server permissions are available.</span></div>
+    </section>
+
+    <section className="threat-content safety-tools-section" id="safety-actions">
+      <div className="threat-section-heading"><div><span className="eyebrow"><Shield size={14}/> SMALL STEPS, STRONGER SHIELDS</span><h2>Quick safety toolkit</h2><p>Prepare trusted Moonlings commands for Discord. Nothing runs from this page.</p></div></div>
+      <SafetyQuickActions />
     </section>
 
     <section className="threat-content guide-section" id="guide">
