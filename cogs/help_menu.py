@@ -7,6 +7,7 @@ class HelpSelect(discord.ui.Select):
         options = [
             discord.SelectOption(label="Welcome & Goodbye", description="Configure custom welcome and goodbye messages", emoji="👋"),
             discord.SelectOption(label="Member Protection", description="Watchlist and user protection suite", emoji="🛡️"),
+            discord.SelectOption(label="Games", description="Counting game, custom emojis, and Truth or Dare", emoji="🎮"),
             discord.SelectOption(label="Moderation", description="Standard moderation commands (warn, kick, ban)", emoji="🔨"),
             discord.SelectOption(label="Safety", description="Advanced moderation (isolate, endbeef, forcename)", emoji="⚔️"),
             discord.SelectOption(label="Threat Security", description="Dynamic pressure tracking, toggles, and modes", emoji="🚨"),
@@ -16,7 +17,6 @@ class HelpSelect(discord.ui.Select):
             discord.SelectOption(label="Staff Applications", description="Staff apply panel and application controls", emoji="🌸"),
             discord.SelectOption(label="Bump System", description="Configure bump tracking and reminders", emoji="💥"),
             discord.SelectOption(label="Server Tools", description="Emoji steal and channel cloning tools", emoji="🧰"),
-            discord.SelectOption(label="Games", description="Counting game, Truth or Dare, and TOD commands", emoji="🎮"),
             discord.SelectOption(label="Audit Logs", description="Configure server event logging", emoji="📜"),
             discord.SelectOption(label="Stats & AFK", description="Activity tracking and AFK status", emoji="📊"),
             discord.SelectOption(label="Fake Permissions", description="Custom role-based permissions setup", emoji="🔑"),
@@ -53,6 +53,22 @@ class HelpSelect(discord.ui.Select):
                     f"`{p}setupboycott mark [@user] [reason]` - Mark a user on the watchlist.\n"
                     f"`{p}setupboycott unmark [@user]` - Remove a user from the watchlist.\n"
                     f"`{p}setupboycott list` - List all currently marked users."
+                ),
+                inline=False
+            )
+
+        elif selected == "Games":
+            embed.title = "🎮 Games & Counting System"
+            embed.description = "Fun games including Counting with custom emojis, Truth or Dare."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`{p}setcounting [#channel]` - Sets up the counting channel.\n"
+                    f"`{p}setcountingemoji success <emoji>` - Sets custom success emoji.\n"
+                    f"`{p}setcountingemoji fail <emoji>` - Sets custom fail emoji.\n"
+                    f"`{p}truth` - Gets a random Truth question.\n"
+                    f"`{p}dare` - Gets a random Dare challenge.\n"
+                    f"`{p}tod` - Asks to choose Truth or Dare."
                 ),
                 inline=False
             )
@@ -173,20 +189,6 @@ class HelpSelect(discord.ui.Select):
                 value=(
                     f"`{p}steal [emoji/url]` - Steals an emoji to the server.\n"
                     f"`{p}clone [#channel]` - Clones an existing channel."
-                ),
-                inline=False
-            )
-
-        elif selected == "Games":
-            embed.title = "🎮 Games"
-            embed.description = "Fun games including Counting and Truth or Dare."
-            embed.add_field(
-                name="📜 Commands",
-                value=(
-                    f"`{p}setcounting [#channel]` - Sets up the counting channel.\n"
-                    f"`{p}truth` - Gets a random Truth question.\n"
-                    f"`{p}dare` - Gets a random Dare challenge.\n"
-                    f"`{p}tod` - Asks to choose Truth or Dare."
                 ),
                 inline=False
             )
