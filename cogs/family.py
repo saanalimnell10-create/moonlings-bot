@@ -182,7 +182,7 @@ class StarFamily(commands.Cog):
 
     @commands.command(name="ship")
     async def ship(self, ctx, user1: discord.Member, user2: discord.Member = None):
-        """Calculates galactic compatibility and generates a moon-themed pookie ship card with large numbers!"""
+        """Calculates galactic compatibility and generates a true circular moon badge ship card!"""
         if not user2:
             user2 = ctx.author
 
@@ -200,26 +200,26 @@ class StarFamily(commands.Cog):
         else:
             comment = "🌌🪐 drifting in different orbits... but still cute! 🤍"
 
-        # Ladataan fontit (ison numeron ja pienemmän tekstin varten)
+        # Fonts
         try:
-            font_large = ImageFont.truetype("DejaVuSans-Bold.ttf", 32)
+            font_large = ImageFont.truetype("DejaVuSans-Bold.ttf", 30)
             font_small = ImageFont.truetype("DejaVuSans.ttf", 12)
         except IOError:
             font_large = ImageFont.load_default()
             font_small = ImageFont.load_default()
 
-        # Luodaan galaktinen ja kuumainen kortti
+        # Canvas setup
         width, height = 600, 240
         image = Image.new("RGBA", (width, height), (22, 14, 32, 255))
         draw = ImageDraw.Draw(image)
 
-        # Piirretään tähtiä taivaalle
+        # Starry background dots
         for _ in range(40):
             rx = random.randint(10, width - 10)
             ry = random.randint(10, height - 10)
             draw.point((rx, ry), fill=(255, 235, 245, random.randint(120, 230)))
 
-        # Söpö pastellinen reuna
+        # Outer pastel border
         draw.rounded_rectangle([10, 10, width-10, height-10], radius=18, outline=(230, 180, 240), width=3)
 
         async def fetch_avatar(user):
@@ -253,28 +253,33 @@ class StarFamily(commands.Cog):
         image.paste(circle1, (50, 55), circle1)
         image.paste(circle2, (452, 55), circle2)
 
-        # Kuumainen ympyräkeskus
-        draw.ellipse((250, 48, 350, 148), fill=(245, 230, 255, 255))
-        draw.ellipse((255, 53, 345, 143), fill=(230, 205, 245, 255))
+        # --- TRUE CIRCLE MOON BADGE IN THE CENTER ---
+        # Center point is X = 300, Y = 98. Radius = 48 (Diameter = 96)
+        cx, cy = 300, 98
+        r = 48
+        draw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(245, 230, 255, 255))
         
-        # Piirretään ISO prosenttiluku keskelle kuuta
+        # Inner true circle ring
+        r_inner = 42
+        draw.ellipse((cx - r_inner, cy - r_inner, cx + r_inner, cy + r_inner), fill=(230, 205, 245, 255))
+        
+        # Draw the percentage number perfectly centered inside the true circle
         score_text = f"{score}%"
-        # Lasketaan tekstin koko keskitystä varten
         bbox = font_large.getbbox(score_text)
         tw = bbox[2] - bbox[0]
         th = bbox[3] - bbox[1]
-        tx = 300 - (tw / 2)
-        ty = 98 - (th / 2)
+        tx = cx - (tw / 2) - bbox[0]
+        ty = cy - (th / 2) - bbox[1]
         draw.text((tx, ty), score_text, font=font_large, fill=(60, 40, 70, 255))
 
-        # Latauspalkki
+        # Progress bar
         bx1, by1, bx2, by2 = 175, 158, 425, 174
         draw.rounded_rectangle([bx1, by1, bx2, by2], radius=8, fill=(40, 25, 50, 255))
         fill_w = int((bx2 - bx1) * (score / 100))
         if fill_w > 0:
             draw.rounded_rectangle([bx1, by1, bx1 + fill_w, by2], radius=8, fill=(220, 170, 235, 255))
 
-        # Otsikot, kommentit ja puuttuvat prosentit
+        # Text labels
         draw.text((165, 22), f"🌙 [ {user1.name} + {user2.name} ] 🌌", font=font_small, fill=(240, 210, 250, 255))
         draw.text((165, 188), f"{comment}", font=font_small, fill=(225, 195, 235, 255))
         draw.text((195, 212), f"✨ Distance to 100%: {missing}% ✨", font=font_small, fill=(170, 150, 190, 255))
