@@ -183,6 +183,7 @@ class StarFamily(commands.Cog):
             user2 = ctx.author
 
         ship_score = (user1.id + user2.id) % 101
+        missing_score = 100 - ship_score
 
         if ship_score >= 90:
             comment = "A perfect match! Soulmates! 💞✨"
@@ -200,7 +201,13 @@ class StarFamily(commands.Cog):
 
         embed = discord.Embed(
             title="💞 Compatibility Love Meter",
-            description=f"**{user1.mention}** x **{user2.mention}**\n\n**Score:** {ship_score}%\n[{bar}]\n\n*{comment}*",
+            description=(
+                f"**{user1.mention}** x **{user2.mention}**\n\n"
+                f"**Score:** {ship_score}%\n"
+                f"[{bar}]\n"
+                f"**Away from 100%:** {missing_score}%\n\n"
+                f"*{comment}*"
+            ),
             color=discord.Color.from_rgb(255, 190, 210)
         )
         embed.set_footer(text="Moonlings Ship System 🌸")
@@ -208,3 +215,4 @@ class StarFamily(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(StarFamily(bot))
+
