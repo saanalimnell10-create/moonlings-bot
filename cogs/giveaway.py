@@ -118,11 +118,13 @@ class InitialClaimView(discord.ui.View):
         button.label = f"Claimed ({len(self.claimed)}/{len(self.winners)})"
         await interaction.message.edit(view=self)
 
-class Giveaway(commands.Cog):
+class Giveaway(commands.GroupCog, name="giveaway"):
     def __init__(self, bot):
         self.bot = bot
+        self.active_giveaways = {}
+        super().__init__()
 
-    @app_commands.command(name="giveaway", description="Create an advanced giveaway with automatic ticket creation and voucher closing.")
+    @app_commands.command(name="create", description="Create an advanced giveaway with automatic ticket creation and voucher closing.")
     @app_commands.describe(
         duration="How long the giveaway lasts (e.g. 30s, 10m, 2h, 1d)",
         winners="The number of winners for this giveaway",
@@ -137,7 +139,7 @@ class Giveaway(commands.Cog):
         image="Large banner image URL"
     )
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def giveaway(
+    async def create(
         self,
         interaction: discord.Interaction,
         duration: str,
@@ -196,7 +198,23 @@ class Giveaway(commands.Cog):
         await interaction.response.send_message(f"✅ Giveaway successfully created in {target_channel.mention}!", ephemeral=True)
         message = await target_channel.send(embed=embed, view=view)
 
+        self.active_giveaways[message.id] = {
+            "view": view,
+            "prize": prize,
+            "winners_count": winners,
+            "claim_time": claim_time,
+            "claim_seconds": claim_seconds,
+            "embed_color": embed_color,
+            "thumbnail": thumbnail,
+            "image": image,
+            "channel": target_channel,
+            "message": message
+        }
+
         await asyncio.sleep(seconds)
+
+        if message.id not in self.active_giveaways:
+            return
 
         view.stop()
         participants_list = list(view.participants)
@@ -210,6 +228,7 @@ class Giveaway(commands.Cog):
             for item in view.children:
                 item.disabled = True
             await message.edit(embed=ended_embed, view=view)
+            self.active_giveaways.pop(message.id, None)
             return
 
         actual_winners_count = min(winners, len(participants_list))
@@ -278,6 +297,105 @@ class Giveaway(commands.Cog):
                 await announcement.reply(f"⏰ Time is up, and no new participants were found for a reroll.")
         else:
             await announcement.reply(f"✨ All winners claimed their prizes on time! Amazing! 🌸💖")
+
+        self.active_giveaways.pop(message.id, None)
+
+    @app_commands.command(name="end", description="End a giveaway early using the giveaway message ID[cite: 3].")
+    @app_commands.describe(message_id="The message ID of the giveaway[cite: 3]")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def end(self, interaction: discord.Interaction, message_id: str):
+        try:
+            m_id = int(message_id)
+        except ValueError:
+            await interaction.response.send_message("❌ Invalid Message ID format!", ephemeral=True)
+            return
+
+        if m_id in self.active_giveaways:
+            data = self.active_giveaways.pop(m_id)
+            try:
+                await data["message"].delete()
+            except discord.HTTPException:
+                pass
+            await interaction.response.send_message(f"✅ Successfully ended and removed the giveaway (ID: {m_id}) early!", ephemeral=True)
+        else:
+            await interaction.response.send_message("❌ Could not find an active giveaway with that Message ID.", ephemeral=True)
+
+    @app_commands.command(name="delete", description="Delete a giveaway message and cancel its active state[cite: 3].")
+    @app_commands.describe(message_id="The message ID of the giveaway to delete[cite: 3]")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def delete(self, interaction: discord.Interaction, message_id: str):
+        try:
+            m_id = int(message_id)
+        except ValueError:
+            await interaction.response.send_message("❌ Invalid Message ID format!", ephemeral=True)
+            return
+
+        if m_id in self.active_giveaways:
+            data = self.active_giveaways.pop(m_id)
+            try:
+                await data["message"].delete()
+            except discord.HTTPException:
+                pass
+            await interaction.response.send_message(f"🗑️ Giveaway (ID: {m_id}) has been successfully deleted[cite: 3]!", ephemeral=True)
+        else:
+            # Yritetään etsiä ja poistaa viesti kanavalta vaikka se ei olisi aktiivisena muistissa
+            try:
+                # Etsitään kanavilta viesti ID:n perusteella
+                found = False
+                for channel in interaction.guild.text_channels:
+                    try:
+                        msg = await channel.fetch_message(m_id)
+                        await msg.delete()
+                        found = True
+                        break
+                    except discord.NotFound:
+                        continue
+                if found:
+                    await interaction.response.send_message(f"🗑️ Giveaway message (ID: {m_id}) found and deleted[cite: 3]!", ephemeral=True)
+                else:
+                    await interaction.response.send_message("❌ Could not find a giveaway message with that ID[cite: 3].", ephemeral=True)
+            except Exception:
+                await interaction.response.send_message("❌ Failed to delete the giveaway message.", ephemeral=True)
+
+    @app_commands.command(name="fix", description="Fix or force-end a giveaway if it fails to end properly[cite: 4].")
+    @app_commands.describe(message_id="The message ID of the stuck giveaway[cite: 4]")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def fix(self, interaction: discord.Interaction, message_id: str):
+        try:
+            m_id = int(message_id)
+        except ValueError:
+            await interaction.response.send_message("❌ Invalid Message ID format!", ephemeral=True)
+            return
+
+        if m_id in self.active_giveaways:
+            self.active_giveaways.pop(m_id)
+            await interaction.response.send_message(f"🛠️ Giveaway (ID: {m_id}) has been force-fixed and cleared from active states[cite: 4]!", ephemeral=True)
+        else:
+            await interaction.response.send_message("❌ No active giveaway state found for this ID to fix[cite: 4].", ephemeral=True)
+
+    @app_commands.command(name="participants", description="View the users that have participated in a giveaway[cite: 4].")
+    @app_commands.describe(message_id="The message ID of the giveaway[cite: 4]")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def participants(self, interaction: discord.Interaction, message_id: str):
+        try:
+            m_id = int(message_id)
+        except ValueError:
+            await interaction.response.send_message("❌ Invalid Message ID format!", ephemeral=True)
+            return
+
+        if m_id in self.active_giveaways:
+            view = self.active_giveaways[m_id]["view"]
+            count = len(view.participants)
+            users_str = ", ".join([f"<@{uid}>" for uid in view.participants]) if view.participants else "No participants yet."
+            
+            embed = discord.Embed(
+                title="🎁 Giveaway Participants",
+                description=f"**Total Participants:** {count}\n\n**Users:** {users_str}",
+                color=discord.Color.from_rgb(230, 210, 240)
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            await interaction.response.send_message("❌ Could not find active participants list for this giveaway ID.", ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Giveaway(bot))
