@@ -28,7 +28,6 @@ class AdvancedMod(commands.Cog):
         """Isolates arguing members into a temporary private channel."""
         guild = ctx.guild
 
-        # Etsitään tai luodaankategoria konfliktikanaville (valinnainen, luodaan tähän kanava)
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
             ctx.author: discord.PermissionOverwrite(read_messages=True, send_messages=True),
@@ -37,8 +36,11 @@ class AdvancedMod(commands.Cog):
             guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
         }
 
-        # Luodaan väliaikainen kanava
-        channel_name = f"safe-space-{user1.name}-{user2.name}"
+        # Luodaan puhdas ja turvallinen kanavaniimi
+        clean_name1 = "".join(c for c in user1.name.lower() if c.isalnum() or c == "-") or "user1"
+        clean_name2 = "".join(c for c in user2.name.lower() if c.isalnum() or c == "-") or "user2"
+        channel_name = f"safe-space-{clean_name1}-{clean_name2}"
+
         isolation_channel = await guild.create_text_channel(
             name=channel_name,
             overwrites=overwrites,
@@ -68,26 +70,37 @@ class AdvancedMod(commands.Cog):
 
     @commands.command(name="endbeef")
     @commands.has_permissions(manage_channels=True)
-    async def end_beef(self, ctx, user1: discord.Member, user2: discord.Member):
+    async def end_beef(self, ctx, user1: discord.Member = None, user2: discord.Member = None):
         """Ends the isolation and deletes the temporary private channel."""
-        channel_name = f"safe-space-{user1.name}-{user2.name}".lower()
-        
-        # Etsitään kanava nimellä
-        channel = discord.utils.get(ctx.guild.text_channels, name=channel_name)
-        
-        if channel:
-            await channel.delete(reason=f"Isolation ended by {ctx.author}")
-            await ctx.send(embed=discord.Embed(
-                title="✨ Conflict Resolved",
-                description=f"The isolation channel for {user1.mention} and {user2.mention} has been closed.",
-                color=0xFFB6C1
-            ))
-        else:
-            # Tarkistetaan jos komento ajetaan suoraan kyseisen konfliktikanavan sisällä
+        # Jos käyttäjiä ei annettu, tarkistetaanko ollaanko suoraan konfliktikanavassa
+        if not user1 and not user2:
             if "safe-space" in ctx.channel.name:
                 await ctx.channel.delete(reason=f"Isolation ended by {ctx.author}")
+                return
+            else:
+                await ctx.send("❌ Please specify the two users or run this command inside the isolation channel.", delete_after=5)
+                return
+
+        # Jos käyttäjät annettiin, etsitään kyseinen kanava niiden mukaan
+        if user1 and user2:
+            target_channel = None
+            for channel in ctx.guild.text_channels:
+                if "safe-space" in channel.name:
+                    if user1 in channel.members and user2 in channel.members:
+                        target_channel = channel
+                        break
+            
+            if target_channel:
+                await target_channel.delete(reason=f"Isolation ended by {ctx.author}")
+                await ctx.send(embed=discord.Embed(
+                    title="✨ Conflict Resolved",
+                    description=f"The isolation channel for {user1.mention} and {user2.mention} has been closed.",
+                    color=0xFFB6C1
+                ))
             else:
                 await ctx.send("❌ Could not find an active isolation channel for these users.", delete_after=5)
+        else:
+            await ctx.send("❌ Please specify both users or run the command inside the isolation channel.", delete_after=5)
 
     # --- FORCENAME ---
 
@@ -98,7 +111,6 @@ class AdvancedMod(commands.Cog):
         guild_id_str = str(ctx.guild.id)
 
         if nickname.lower() == "remove":
-            # Poistetaan pakotus
             if guild_id_str in self.forced_names and str(member.id) in self.forced_names[guild_id_str]:
                 del self.forced_names[guild_id_str][str(member.id)]
                 save_forced_names(self.forced_names)
@@ -115,7 +127,6 @@ class AdvancedMod(commands.Cog):
         try:
             await member.edit(nick=nickname, reason=f"Forced nickname by {ctx.author}")
             
-            # Tallennetaan muistiin ja JSON-tiedostoon
             if guild_id_str not in self.forced_names:
                 self.forced_names[guild_id_str] = {}
             
@@ -134,7 +145,7 @@ class AdvancedMod(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
-        """Automattisesti palauttaa pakotetun lempinimen, jos käyttäjä yrittää vaihtaa sitä."""
+        """Automaattisesti palauttaa pakotetun lempinimen, jos käyttäjä yrittää vaihtaa sitä."""
         guild_id_str = str(after.guild.id)
         
         if guild_id_str in self.forced_names:
@@ -148,7 +159,6 @@ class AdvancedMod(commands.Cog):
                         await after.edit(nick=target_nick, reason="Re-applying forced nickname lock.")
                     except discord.Forbidden:
                         pass
-
 
 async def setup(bot):
     await bot.add_cog(AdvancedMod(bot))
