@@ -95,21 +95,17 @@ class InitialClaimView(discord.ui.View):
             reason=f"Giveaway prize claim ticket for {member}"
         )
 
+        ticket_desc = (
+            f"Hello {member.mention}! Congratulations on winning!\n\n"
+            f"🎁 **Prize:** {self.prize}\n\n"
+            f"**Step by step instructions:**\n"
+            f"1. Wait for staff to deliver your prize in this channel.\n"
+            f"2. Once received, click **'Vouch & Close Ticket 🌸'** below to confirm. The ticket will close automatically! ✨"
+        )
+
         ticket_embed = discord.Embed(
             title="🌸 Giveaway Prize Ticket",
-            description=(
-                f"Hello {member.mention}! Congratulations on winning!
-
-"
-                f"🎁 **Prize:** {self.prize}
-
-"
-                f"**Step by step instructions:**
-"
-                f"1. Wait for staff to deliver your prize in this channel.
-"
-                f"2. Once received, click **'Vouch & Close Ticket 🌸'** below to confirm. The ticket will close automatically! ✨"
-            ),
+            description=ticket_desc,
             color=discord.Color.from_rgb(230, 210, 240)
         )
         ticket_embed.set_footer(text="Moonlings Ticket System 🌸")
@@ -161,24 +157,19 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             except ValueError:
                 pass
 
+        embed_desc = (
+            f"**Prize:** {prize}\n"
+            f"**Winner(s):** {winners}\n"
+            f"**Required Role:** {required_role.mention if required_role else 'None'}\n"
+            f"**Claim Time:** {claim_time}\n"
+            f"**Max Rerolls:** {rerolls}\n"
+            f"**Hosted by:** {hosting_member.mention}\n\n"
+            f"✨ Click the button below to join the giveaway!"
+        )
+
         embed = discord.Embed(
             title="🎁 **GIVEAWAY TIME!** 🎁",
-            description=(
-                f"**Prize:** {prize}
-"
-                f"**Winner(s):** {winners}
-"
-                f"**Required Role:** {required_role.mention if required_role else 'None'}
-"
-                f"**Claim Time:** {claim_time}
-"
-                f"**Max Rerolls:** {rerolls}
-"
-                f"**Hosted by:** {hosting_member.mention}
-
-"
-                f"✨ Click the button below to join the giveaway!"
-            ),
+            description=embed_desc,
             color=embed_color
         )
         if thumbnail:
@@ -220,9 +211,7 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         if not participants_list:
             ended_embed = discord.Embed(
                 title="🎁 **Giveaway Ended**",
-                description=f"**Prize:** {prize}
-
-❌ Not enough participants to pick a winner.",
+                description=f"**Prize:** {prize}\n\n❌ Not enough participants to pick a winner.",
                 color=embed_color
             )
             for item in view.children:
@@ -243,10 +232,8 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             if winner_user:
                 try:
                     await winner_user.send(
-                        f"🎉 **Congratulations!** You won a giveaway in **{target_channel.guild.name}**!
-"
-                        f"🎁 **Prize:** {prize}
-"
+                        f"🎉 **Congratulations!** You won a giveaway in **{target_channel.guild.name}**!\n"
+                        f"🎁 **Prize:** {prize}\n"
                         f"🎟️ Head back to the server and click the **'Claim Prize 🎫'** button on the giveaway message to create your claim ticket within **{claim_time}**! 🌸✨"
                     )
                 except discord.Forbidden:
@@ -254,18 +241,16 @@ class Giveaway(commands.GroupCog, name="giveaway"):
 
         claim_view = InitialClaimView(initial_winners, prize)
 
+        claim_desc = (
+            f"**Prize:** {prize}\n"
+            f"**Winner(s):** {winner_mentions}\n"
+            f"**Claim Deadline:** {claim_time}\n\n"
+            f"✨ Winners have been DMed! They must click the **'Claim Prize 🎫'** button to automatically create their ticket."
+        )
+
         ended_embed = discord.Embed(
             title="🎁 **Giveaway Ended - Claiming Phase**",
-            description=(
-                f"**Prize:** {prize}
-"
-                f"**Winner(s):** {winner_mentions}
-"
-                f"**Claim Deadline:** {claim_time}
-
-"
-                f"✨ Winners have been DMed! They must click the **'Claim Prize 🎫'** button to automatically create their ticket."
-            ),
+            description=claim_desc,
             color=embed_color
         )
         if thumbnail:
@@ -288,14 +273,13 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             if reroll_count > 0:
                 new_winners = random.sample(eligible_for_reroll, reroll_count)
                 for nw_id in new_winners:
+                    new_winner_user = target_channel.guild.get_model if hasattr(target_channel.guild, 'get_member') else None
                     new_winner_user = target_channel.guild.get_member(nw_id)
                     if new_winner_user:
                         try:
                             await new_winner_user.send(
-                                f"🎉 **Giveaway Reroll Win!** You got a second chance in **{target_channel.guild.name}**!
-"
-                                f"🎁 **Prize:** {prize}
-"
+                                f"🎉 **Giveaway Reroll Win!** You got a second chance in **{target_channel.guild.name}**!\n"
+                                f"🎁 **Prize:** {prize}\n"
                                 f"🌸 Claim your prize right away! ✨"
                             )
                         except discord.Forbidden:
@@ -360,20 +344,20 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             else:
                 await ctx.send("❌ Could not find a giveaway message with that ID.")
 
-    @commands.command(name="fix", description="Force-fix or clear a stuck giveaway state")
+    @commands.command(name="fix", description="Format or clear stuck giveaway state")
     @commands.has_permissions(manage_guild=True)
     async def fix(self, ctx, message_id: str):
         try:
             m_id = int(message_id)
         except ValueError:
-            await ctx.send("❌ Invalid Message ID format!")
+            await ctx.send(f"❌ Invalid Message ID format!")
             return
 
         if m_id in self.active_giveaways:
             self.active_giveaways.pop(m_id)
             await ctx.send(f"🔧 Giveaway (ID: {m_id}) has been force-fixed and cleared from active states!")
         else:
-            await ctx.send("❌ No active giveaway state found for this ID to fix.")
+            await ctx.send(f"❌ No active giveaway state found for this ID to fix.")
 
     @commands.command(name="participants", description="View all users who have participated")
     @commands.has_permissions(manage_guild=True)
@@ -381,7 +365,7 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         try:
             m_id = int(message_id)
         except ValueError:
-            await ctx.send("❌ Invalid Message ID format!")
+            await ctx.send(f"❌ Invalid Message ID format!")
             return
 
         if m_id in self.active_giveaways:
@@ -389,17 +373,15 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             count = len(view.participants)
             users_str = ", ".join([f"<@{uid}>" for uid in view.participants]) if view.participants else "No participants yet."
 
+            part_desc = f"**Total Participants:** {count}\n\n**Users:** {users_str}"
             embed = discord.Embed(
                 title="🎁 Giveaway Participants",
-                description=f"**Total Participants:** {count}
-
-**Users:** {users_str}",
+                description=part_desc,
                 color=discord.Color.from_rgb(230, 210, 240)
             )
             await ctx.send(embed=embed)
         else:
-            await ctx.send("❌ Could not find active participants list for this giveaway ID.")
+            await ctx.send(f"❌ Could not find active participants list for this giveaway ID.")
 
 async def setup(bot):
     await bot.add_cog(Giveaway(bot))
-
