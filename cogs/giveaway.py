@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import random
 import re
+import typing
 
 def convert_time(time_str):
     match = re.match(r"^(\d+)([smhd])$", time_str.lower())
@@ -97,10 +98,16 @@ class InitialClaimView(discord.ui.View):
         ticket_embed = discord.Embed(
             title="🌸 Giveaway Prize Ticket",
             description=(
-                f"Hello {member.mention}! Congratulations on winning!\n\n"
-                f"🎁 **Prize:** {self.prize}\n\n"
-                f"**Step by step instructions:**\n"
-                f"1. Wait for staff to deliver your prize in this channel.\n"
+                f"Hello {member.mention}! Congratulations on winning!
+
+"
+                f"🎁 **Prize:** {self.prize}
+
+"
+                f"**Step by step instructions:**
+"
+                f"1. Wait for staff to deliver your prize in this channel.
+"
                 f"2. Once received, click **'Vouch & Close Ticket 🌸'** below to confirm. The ticket will close automatically! ✨"
             ),
             color=discord.Color.from_rgb(230, 210, 240)
@@ -127,6 +134,7 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         ctx,
         duration: str,
         winners: int,
+        required_role: typing.Optional[discord.Role] = None,
         *,
         prize: str
     ):
@@ -134,7 +142,6 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         hosting_member = ctx.author
         claim_time = "24h"
         rerolls = 1
-        required_roles = None
         color = "#FFB6C1"
         thumbnail = None
         image = None
@@ -157,11 +164,19 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         embed = discord.Embed(
             title="🎁 **GIVEAWAY TIME!** 🎁",
             description=(
-                f"**Prize:** {prize}\n"
-                f"**Winner(s):** {winners}\n"
-                f"**Claim Time:** {claim_time}\n"
-                f"**Max Rerolls:** {rerolls}\n"
-                f"**Hosted by:** {hosting_member.mention}\n\n"
+                f"**Prize:** {prize}
+"
+                f"**Winner(s):** {winners}
+"
+                f"**Required Role:** {required_role.mention if required_role else 'None'}
+"
+                f"**Claim Time:** {claim_time}
+"
+                f"**Max Rerolls:** {rerolls}
+"
+                f"**Hosted by:** {hosting_member.mention}
+
+"
                 f"✨ Click the button below to join the giveaway!"
             ),
             color=embed_color
@@ -172,11 +187,14 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             embed.set_image(url=image)
         embed.set_footer(text="Moonlings Advanced Giveaway 🌸")
 
-        role_ids = [required_roles.id] if required_roles else []
+        role_ids = [required_role.id] if required_role else []
         view = GiveawayJoinButton(prize, winners, role_ids)
 
         message = await target_channel.send(embed=embed, view=view)
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except discord.HTTPException:
+            pass
 
         self.active_giveaways[message.id] = {
             "view": view,
@@ -202,12 +220,17 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         if not participants_list:
             ended_embed = discord.Embed(
                 title="🎁 **Giveaway Ended**",
-                description=f"**Prize:** {prize}\n\n❌ Not enough participants to pick a winner.",
+                description=f"**Prize:** {prize}
+
+❌ Not enough participants to pick a winner.",
                 color=embed_color
             )
             for item in view.children:
                 item.disabled = True
-            await message.edit(embed=ended_embed, view=view)
+            try:
+                await message.edit(embed=ended_embed, view=view)
+            except discord.HTTPException:
+                pass
             self.active_giveaways.pop(message.id, None)
             return
 
@@ -220,8 +243,10 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             if winner_user:
                 try:
                     await winner_user.send(
-                        f"🎉 **Congratulations!** You won a giveaway in **{target_channel.guild.name}**!\n"
-                        f"🎁 **Prize:** {prize}\n"
+                        f"🎉 **Congratulations!** You won a giveaway in **{target_channel.guild.name}**!
+"
+                        f"🎁 **Prize:** {prize}
+"
                         f"🎟️ Head back to the server and click the **'Claim Prize 🎫'** button on the giveaway message to create your claim ticket within **{claim_time}**! 🌸✨"
                     )
                 except discord.Forbidden:
@@ -232,9 +257,13 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         ended_embed = discord.Embed(
             title="🎁 **Giveaway Ended - Claiming Phase**",
             description=(
-                f"**Prize:** {prize}\n"
-                f"**Winner(s):** {winner_mentions}\n"
-                f"**Claim Deadline:** {claim_time}\n\n"
+                f"**Prize:** {prize}
+"
+                f"**Winner(s):** {winner_mentions}
+"
+                f"**Claim Deadline:** {claim_time}
+
+"
                 f"✨ Winners have been DMed! They must click the **'Claim Prize 🎫'** button to automatically create their ticket."
             ),
             color=embed_color
@@ -263,8 +292,10 @@ class Giveaway(commands.GroupCog, name="giveaway"):
                     if new_winner_user:
                         try:
                             await new_winner_user.send(
-                                f"🎉 **Giveaway Reroll Win!** You got a second chance in **{target_channel.guild.name}**!\n"
-                                f"🎁 **Prize:** {prize}\n"
+                                f"🎉 **Giveaway Reroll Win!** You got a second chance in **{target_channel.guild.name}**!
+"
+                                f"🎁 **Prize:** {prize}
+"
                                 f"🌸 Claim your prize right away! ✨"
                             )
                         except discord.Forbidden:
@@ -360,7 +391,9 @@ class Giveaway(commands.GroupCog, name="giveaway"):
 
             embed = discord.Embed(
                 title="🎁 Giveaway Participants",
-                description=f"**Total Participants:** {count}\n\n**Users:** {users_str}",
+                description=f"**Total Participants:** {count}
+
+**Users:** {users_str}",
                 color=discord.Color.from_rgb(230, 210, 240)
             )
             await ctx.send(embed=embed)
