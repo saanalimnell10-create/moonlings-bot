@@ -5,7 +5,7 @@ import os
 import io
 import aiohttp
 import random
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 DATA_FILE = "star_family.json"
 
@@ -182,7 +182,7 @@ class StarFamily(commands.Cog):
 
     @commands.command(name="ship")
     async def ship(self, ctx, user1: discord.Member, user2: discord.Member = None):
-        """Calculates galactic compatibility and generates a moon-themed pookie ship card!"""
+        """Calculates galactic compatibility and generates a moon-themed pookie ship card with large numbers!"""
         if not user2:
             user2 = ctx.author
 
@@ -200,18 +200,26 @@ class StarFamily(commands.Cog):
         else:
             comment = "🌌🪐 drifting in different orbits... but still cute! 🤍"
 
+        # Ladataan fontit (ison numeron ja pienemmän tekstin varten)
+        try:
+            font_large = ImageFont.truetype("DejaVuSans-Bold.ttf", 32)
+            font_small = ImageFont.truetype("DejaVuSans.ttf", 12)
+        except IOError:
+            font_large = ImageFont.load_default()
+            font_small = ImageFont.load_default()
+
         # Luodaan galaktinen ja kuumainen kortti
         width, height = 600, 240
-        image = Image.new("RGBA", (width, height), (22, 14, 32, 255)) # Dark space violet
+        image = Image.new("RGBA", (width, height), (22, 14, 32, 255))
         draw = ImageDraw.Draw(image)
 
-        # Piirretään satunnaisia pieniä "tähtiä" taivaalle
+        # Piirretään tähtiä taivaalle
         for _ in range(40):
             rx = random.randint(10, width - 10)
             ry = random.randint(10, height - 10)
             draw.point((rx, ry), fill=(255, 235, 245, random.randint(120, 230)))
 
-        # Söpö pastellinen yötaivaan reunus
+        # Söpö pastellinen reuna
         draw.rounded_rectangle([10, 10, width-10, height-10], radius=18, outline=(230, 180, 240), width=3)
 
         async def fetch_avatar(user):
@@ -234,7 +242,6 @@ class StarFamily(commands.Cog):
             output = Image.new("RGBA", (90, 90), (0, 0, 0, 0))
             output.paste(av, (0, 0), mask=mask)
             
-            # Vaaleanpunertava/kuumainen reunus avatarille
             ring = Image.new("RGBA", (98, 98), (0, 0, 0, 0))
             ImageDraw.Draw(ring).ellipse((0, 0, 98, 98), fill=(240, 180, 220, 255))
             ring.paste(output, (4, 4), mask=output)
@@ -246,22 +253,31 @@ class StarFamily(commands.Cog):
         image.paste(circle1, (50, 55), circle1)
         image.paste(circle2, (452, 55), circle2)
 
-        # Kuumainen ympyräkeskus (Moon Badge) prosentilla
-        draw.ellipse((255, 52, 345, 142), fill=(245, 230, 255, 255))
-        draw.ellipse((260, 57, 340, 137), fill=(230, 205, 245, 255)) # Pieni sisäkehä
-        draw.text((283, 85), f"{score}%", fill=(60, 40, 70, 255))
+        # Kuumainen ympyräkeskus
+        draw.ellipse((250, 48, 350, 148), fill=(245, 230, 255, 255))
+        draw.ellipse((255, 53, 345, 143), fill=(230, 205, 245, 255))
+        
+        # Piirretään ISO prosenttiluku keskelle kuuta
+        score_text = f"{score}%"
+        # Lasketaan tekstin koko keskitystä varten
+        bbox = font_large.getbbox(score_text)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+        tx = 300 - (tw / 2)
+        ty = 98 - (th / 2)
+        draw.text((tx, ty), score_text, font=font_large, fill=(60, 40, 70, 255))
 
-        # Latauspalkki (galaktisen pastellinen)
-        bx1, by1, bx2, by2 = 175, 152, 425, 168
+        # Latauspalkki
+        bx1, by1, bx2, by2 = 175, 158, 425, 174
         draw.rounded_rectangle([bx1, by1, bx2, by2], radius=8, fill=(40, 25, 50, 255))
         fill_w = int((bx2 - bx1) * (score / 100))
         if fill_w > 0:
             draw.rounded_rectangle([bx1, by1, bx1 + fill_w, by2], radius=8, fill=(220, 170, 235, 255))
 
         # Otsikot, kommentit ja puuttuvat prosentit
-        draw.text((165, 22), f"🌙 [ {user1.name} + {user2.name} ] 🌌", fill=(240, 210, 250, 255))
-        draw.text((165, 184), f"{comment}", fill=(225, 195, 235, 255))
-        draw.text((195, 210), f"✨ Distance to 100%: {missing}% ✨", fill=(170, 150, 190, 255))
+        draw.text((165, 22), f"🌙 [ {user1.name} + {user2.name} ] 🌌", font=font_small, fill=(240, 210, 250, 255))
+        draw.text((165, 188), f"{comment}", font=font_small, fill=(225, 195, 235, 255))
+        draw.text((195, 212), f"✨ Distance to 100%: {missing}% ✨", font=font_small, fill=(170, 150, 190, 255))
 
         buffer = io.BytesIO()
         image.save(buffer, format="PNG")
