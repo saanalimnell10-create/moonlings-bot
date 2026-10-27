@@ -182,7 +182,7 @@ class StarFamily(commands.Cog):
 
     @commands.command(name="ship")
     async def ship(self, ctx, user1: discord.Member, user2: discord.Member = None):
-        """Calculates galactic compatibility and generates a cute pookie ship card!"""
+        """Calculates galactic compatibility and generates a moon-themed pookie ship card!"""
         if not user2:
             user2 = ctx.author
 
@@ -190,29 +190,29 @@ class StarFamily(commands.Cog):
         missing = 100 - score
 
         if score >= 90:
-            comment = "✨ absolute pookie soulmates floating in the galaxy! 💖"
+            comment = "🌙✨ absolute moonlit pookie soulmates in the galaxy! 💖"
         elif score >= 70:
-            comment = "🌸 super cute cosmic besties & partners! 🥰"
+            comment = "🌸💫 super cute cosmic besties & stellar partners! 🥰"
         elif score >= 40:
-            comment = "💫 starry vibes, good chemistry! 😊"
+            comment = "🪐✨ starry vibes, good space chemistry! 😊"
         elif score >= 20:
-            comment = "🌙 cute friendly space travel buds! 🛸"
+            comment = "🌙🛸 cute friendly lunar travel buds! 💫"
         else:
-            comment = "🪐 drifting in different orbits... but still cute! 🤍"
+            comment = "🌌🪐 drifting in different orbits... but still cute! 🤍"
 
-        # Luodaan galaktinen ja söpö kortti
+        # Luodaan galaktinen ja kuumainen kortti
         width, height = 600, 240
-        image = Image.new("RGBA", (width, height), (25, 15, 35, 255)) # Galaxy dark purple
+        image = Image.new("RGBA", (width, height), (22, 14, 32, 255)) # Dark space violet
         draw = ImageDraw.Draw(image)
 
-        # Piirretään satunnaisia pieniä "tähtiä" taivaalle (galactic dust)
-        for _ in range(35):
+        # Piirretään satunnaisia pieniä "tähtiä" taivaalle
+        for _ in range(40):
             rx = random.randint(10, width - 10)
             ry = random.randint(10, height - 10)
-            draw.point((rx, ry), fill=(255, 240, 250, random.randint(100, 220)))
+            draw.point((rx, ry), fill=(255, 235, 245, random.randint(120, 230)))
 
-        # Söpö pastellinen reuna
-        draw.rounded_rectangle([10, 10, width-10, height-10], radius=18, outline=(255, 180, 220), width=3)
+        # Söpö pastellinen yötaivaan reunus
+        draw.rounded_rectangle([10, 10, width-10, height-10], radius=18, outline=(230, 180, 240), width=3)
 
         async def fetch_avatar(user):
             url = user.display_avatar.with_size(128).url
@@ -234,9 +234,9 @@ class StarFamily(commands.Cog):
             output = Image.new("RGBA", (90, 90), (0, 0, 0, 0))
             output.paste(av, (0, 0), mask=mask)
             
-            # Söpö vaaleanpunainen reunus avatarille
+            # Vaaleanpunertava/kuumainen reunus avatarille
             ring = Image.new("RGBA", (98, 98), (0, 0, 0, 0))
-            ImageDraw.Draw(ring).ellipse((0, 0, 98, 98), fill=(255, 160, 200, 255))
+            ImageDraw.Draw(ring).ellipse((0, 0, 98, 98), fill=(240, 180, 220, 255))
             ring.paste(output, (4, 4), mask=output)
             return ring
 
@@ -246,27 +246,28 @@ class StarFamily(commands.Cog):
         image.paste(circle1, (50, 55), circle1)
         image.paste(circle2, (452, 55), circle2)
 
-        # Sydän keskelle prosentilla
-        draw.ellipse((260, 55, 340, 125), fill=(255, 110, 160, 255))
-        draw.text((285, 82), f"{score}%", fill=(255, 255, 255, 255))
+        # Kuumainen ympyräkeskus (Moon Badge) prosentilla
+        draw.ellipse((255, 52, 345, 142), fill=(245, 230, 255, 255))
+        draw.ellipse((260, 57, 340, 137), fill=(230, 205, 245, 255)) # Pieni sisäkehä
+        draw.text((283, 85), f"{score}%", fill=(60, 40, 70, 255))
 
-        # Latauspalkki (pastelli vaaleanpunainen)
-        bx1, by1, bx2, by2 = 175, 150, 425, 166
-        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=8, fill=(45, 30, 55, 255))
+        # Latauspalkki (galaktisen pastellinen)
+        bx1, by1, bx2, by2 = 175, 152, 425, 168
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=8, fill=(40, 25, 50, 255))
         fill_w = int((bx2 - bx1) * (score / 100))
         if fill_w > 0:
-            draw.rounded_rectangle([bx1, by1, bx1 + fill_w, by2], radius=8, fill=(255, 150, 200, 255))
+            draw.rounded_rectangle([bx1, by1, bx1 + fill_w, by2], radius=8, fill=(220, 170, 235, 255))
 
-        # Nimet, galaktinen teema ja puuttuvat prosentit
-        draw.text((170, 25), f"🌌 [ {user1.name} + {user2.name} ] 🪐", fill=(255, 220, 240, 255))
-        draw.text((170, 185), f"{comment}", fill=(230, 200, 220, 255))
-        draw.text((195, 210), f"✨ Missing to 100%: {missing}% ✨", fill=(180, 160, 200, 255))
+        # Otsikot, kommentit ja puuttuvat prosentit
+        draw.text((165, 22), f"🌙 [ {user1.name} + {user2.name} ] 🌌", fill=(240, 210, 250, 255))
+        draw.text((165, 184), f"{comment}", fill=(225, 195, 235, 255))
+        draw.text((195, 210), f"✨ Distance to 100%: {missing}% ✨", fill=(170, 150, 190, 255))
 
         buffer = io.BytesIO()
         image.save(buffer, format="PNG")
         buffer.seek(0)
 
-        file = discord.File(buffer, filename="galaxy_ship.png")
+        file = discord.File(buffer, filename="moon_ship.png")
         await ctx.send(file=file)
 
 async def setup(bot):
