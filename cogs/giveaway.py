@@ -124,78 +124,76 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         self.active_giveaways = {}
         super().__init__()
 
-    @app_commands.command(name="create", description="Create an advanced giveaway with automatic ticket creation and voucher closing.")
-    @app_commands.describe(
-        duration="How long the giveaway lasts (e.g. 30s, 10m, 2h, 1d)",
-        winners="The number of winners for this giveaway",
-        prize="The prize of this giveaway",
-        claim_time="Time for winners to claim before auto-reroll (e.g. 1h, 24h)",
-        rerolls="How many maximum reroll attempts/slots to run if unclaimed",
-        channel="The channel where the giveaway will be created",
-        host="The host of this giveaway",
-        required_roles="Optional required role to participate",
-        color="Hex code for the embed (e.g. #FFB6C1)",
-        thumbnail="Thumbnail image URL",
-        image="Large banner image URL"
-    )
+    @app_commands.command(name="create", description="Create an interactive giveaway step-by-step with skip options.")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def create(
-        self,
-        interaction: discord.Interaction,
-        duration: str,
-        winners: int,
-        prize: str,
-        claim_time: str = "24h",
-        rerolls: int = 1,
-        channel: discord.TextChannel = None,
-        host: discord.Member = None,
-        required_roles: discord.Role = None,
-        color: str = "#FFB6C1",
-        thumbnail: str = None,
-        image: str = None
-    ):
-        target_channel = channel or interaction.channel
-        hosting_member = host or interaction.user
+    async def create(self, interaction: discord.Interaction):
+        await interaction.response.send_message("🌸 **Giveaway Setup Wizard** started! What is the **prize** for this giveaway?", ephemeral=True)
+        
+        def check(m):
+            return m.author == interaction.user and m.channel == interaction.channel
+
+        try:
+            # 1. Prize
+            msg = await self.bot.wait_for("message", timeout=45.0, check=check)
+            prize = msg.content
+            await msg.delete()
+
+            # 2. Duration
+            await interaction.edit_original_response(content="⏱️ How long should the giveaway last? (e.g. `30s`, `10m`, `2h`, `1d`) [Type `skip` for default 1h]")
+            msg = await self.bot.wait_for("message", timeout=45.0, check=check)
+            duration = "1h" if msg.content.lower() == "skip" else msg.content
+            await msg.delete()
+
+            # 3. Winners count
+            await interaction.edit_original_response(content="🏆 How many winners? [Type `skip` for default 1]")
+            msg = await self.bot.wait_for("message", timeout=45.0, check=check)
+            winners = 1 if msg.content.lower() == "skip" else int(msg.content)
+            await msg.delete()
+
+            # 4. Claim Time
+            await interaction.edit_original_response(content="⏳ Time for winners to claim before auto-reroll? (e.g. `1h`, `24h`) [Type `skip` for default 24h]")
+            msg = await self.bot.wait_for("message", timeout=45.0, check=check)
+            claim_time = "24h" if msg.content.lower() == "skip" else msg.content
+            await msg.delete()
+
+            # 5. Channel
+            await interaction.edit_original_response(content="📢 Tag the channel where to post this giveaway (e.g. `#giveaways`) [Type `skip` for current channel]")
+            msg = await self.bot.wait_for("message", timeout=45.0, check=check)
+            if msg.content.lower() == "skip" or not msg.channel_mentions:
+                target_channel = interaction.channel
+            else:
+                target_channel = msg.channel_mentions[0]
+            await msg.delete()
+
+        except asyncio.TimeoutError:
+            await interaction.edit_original_response(content="❌ Giveaway setup timed out. Please try again.")
+            return
+        except ValueError:
+            await interaction.edit_original_response(content="❌ Invalid number provided. Setup cancelled.")
+            return
 
         seconds = convert_time(duration)
         claim_seconds = convert_time(claim_time)
-
-        if not seconds or not claim_seconds:
-            await interaction.response.send_message("❌ Invalid time format! Use something like: `30s`, `10m`, `2h`, or `1d`.", ephemeral=True)
-            return
+        if not seconds:
+            seconds = 3600
+        if not claim_seconds:
+            claim_seconds = 86400
 
         embed_color = discord.Color.from_rgb(230, 210, 240)
-        if color:
-            try:
-                clean_hex = color.lstrip('#')
-                embed_color = discord.Color(int(clean_hex, 16))
-            except ValueError:
-                pass
-
         embed = discord.Embed(
             title="🎁 **GIVEAWAY TIME!** 🎁",
             description=(
                 f"**Prize:** {prize}\n"
                 f"**Winner(s):** {winners}\n"
                 f"**Claim Time:** {claim_time}\n"
-                f"**Max Rerolls:** {rerolls}\n"
-                f"**Hosted by:** {hosting_member.mention}\n"
-                f"{f'**Required Role:** {required_roles.mention}' if required_roles else ''}\n\n"
+                f"**Hosted by:** {interaction.user.mention}\n\n"
                 f"✨ Click the button below to join the giveaway!"
             ),
             color=embed_color
         )
-        if thumbnail:
-            embed.set_thumbnail(url=thumbnail)
-        if image:
-            embed.set_image(url=image)
-
         embed.set_footer(text="Moonlings Advanced Giveaway 🌸")
 
-        role_ids = [required_roles.id] if required_roles else []
-        view = GiveawayJoinButton(prize, winners, role_ids)
-
-        await interaction.response.send_message(f"✅ Giveaway successfully created in {target_channel.mention}!", ephemeral=True)
+        view = GiveawayJoinButton(prize, winners, [])
         message = await target_channel.send(embed=embed, view=view)
 
         self.active_giveaways[message.id] = {
@@ -205,11 +203,11 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             "claim_time": claim_time,
             "claim_seconds": claim_seconds,
             "embed_color": embed_color,
-            "thumbnail": thumbnail,
-            "image": image,
             "channel": target_channel,
             "message": message
         }
+
+        await interaction.edit_original_response(content=f"✅ Giveaway successfully created in {target_channel.mention}! 🎉✨")
 
         await asyncio.sleep(seconds)
 
@@ -242,7 +240,7 @@ class Giveaway(commands.GroupCog, name="giveaway"):
                     await winner_user.send(
                         f"🎉 **Congratulations!** You won a giveaway in **{target_channel.guild.name}**!\n"
                         f"🎁 **Prize:** {prize}\n"
-                        f"🎫 Head back to the server and click the **'Claim Prize 🎫'** button on the giveaway message to create your claim ticket within **{claim_time}**! 🌸✨"
+                        f"🎫 Head back to the server and click the **'Claim Prize 🎫'** button on the giveaway message within **{claim_time}**! 🌸✨"
                     )
                 except discord.Forbidden:
                     pass
@@ -259,11 +257,6 @@ class Giveaway(commands.GroupCog, name="giveaway"):
             ),
             color=embed_color
         )
-        if thumbnail:
-            ended_embed.set_thumbnail(url=thumbnail)
-        if image:
-            ended_embed.set_image(url=image)
-
         ended_embed.set_footer(text="Moonlings Giveaway Claim System 🌸")
         await message.edit(embed=ended_embed, view=claim_view)
         announcement = await message.reply(f"🎉 Congratulations to the winners: {winner_mentions}! Check your DMs and click the button above within **{claim_time}**! 🌸✨")
@@ -271,28 +264,17 @@ class Giveaway(commands.GroupCog, name="giveaway"):
         await asyncio.sleep(claim_seconds)
 
         unclaimed = [w for w in initial_winners if w not in claim_view.claimed]
-        
         if unclaimed:
             eligible_for_reroll = [p for p in participants_list if p not in claim_view.claimed and p not in initial_winners]
-            reroll_count = min(len(unclaimed), len(eligible_for_reroll), rerolls)
-            
-            if reroll_count > 0:
-                new_winners = random.sample(eligible_for_reroll, reroll_count)
-                
-                for nw_id in new_winners:
-                    new_winner_user = target_channel.guild.get_member(nw_id)
-                    if new_winner_user:
-                        try:
-                            await new_winner_user.send(
-                                f"🎉 **Giveaway Reroll Win!** You got a second chance in **{target_channel.guild.name}**!\n"
-                                f"🎁 **Prize:** {prize}\n"
-                                f"🌸 Claim your prize right away! ✨"
-                            )
-                        except discord.Forbidden:
-                            pass
-
-                new_winner_mentions = ", ".join([f"<@{nw}>" for nw in new_winners])
-                await announcement.reply(f"⏰ Time is up! Unclaimed prizes resulted in new rerolls: {new_winner_mentions}! 🌸✨")
+            if eligible_for_reroll:
+                new_winner = random.choice(eligible_for_reroll)
+                new_winner_user = target_channel.guild.get_member(new_winner)
+                if new_winner_user:
+                    try:
+                        await new_winner_user.send(f"🎉 **Giveaway Reroll Win!** You won the reroll for **{prize}** in **{target_channel.guild.name}**! 🌸✨")
+                    except discord.Forbidden:
+                        pass
+                await announcement.reply(f"⏰ Time is up! An unclaimed prize resulted in a new winner: <@{new_winner}>! 🌸✨")
             else:
                 await announcement.reply(f"⏰ Time is up, and no new participants were found for a reroll.")
         else:
@@ -338,9 +320,7 @@ class Giveaway(commands.GroupCog, name="giveaway"):
                 pass
             await interaction.response.send_message(f"🗑️ Giveaway (ID: {m_id}) has been successfully deleted[cite: 3]!", ephemeral=True)
         else:
-            # Yritetään etsiä ja poistaa viesti kanavalta vaikka se ei olisi aktiivisena muistissa
             try:
-                # Etsitään kanavilta viesti ID:n perusteella
                 found = False
                 for channel in interaction.guild.text_channels:
                     try:
