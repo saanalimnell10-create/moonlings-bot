@@ -2,6 +2,10 @@ import discord
 from discord.ext import commands
 import json
 import os
+import io
+import aiohttp
+import random
+from PIL import Image, ImageDraw
 
 DATA_FILE = "star_family.json"
 
@@ -122,7 +126,7 @@ class StarFamily(commands.Cog):
         ensure_user(data, c_id)
 
         if c_id in data[p_id]["children"]:
-            await ctx.send(f"🌸 {member.mention} is already your child!")
+            await ctx.send(f"🌸 {member.mention} is already your child! 💕")
             return
 
         data[p_id]["children"].append(c_id)
@@ -178,40 +182,92 @@ class StarFamily(commands.Cog):
 
     @commands.command(name="ship")
     async def ship(self, ctx, user1: discord.Member, user2: discord.Member = None):
-        """Calculates compatibility between two members with cute commentary."""
+        """Calculates galactic compatibility and generates a cute pookie ship card!"""
         if not user2:
             user2 = ctx.author
 
-        ship_score = (user1.id + user2.id) % 101
-        missing_score = 100 - ship_score
+        score = (user1.id + user2.id) % 101
+        missing = 100 - score
 
-        if ship_score >= 90:
-            comment = "A perfect match! Soulmates! 💞✨"
-        elif ship_score >= 70:
-            comment = "A really cute couple together! 🥰🌸"
-        elif ship_score >= 40:
-            comment = "Good chances, chemistry found! 😊"
-        elif ship_score >= 20:
-            comment = "Maybe better as friends? 😅"
+        if score >= 90:
+            comment = "✨ absolute pookie soulmates floating in the galaxy! 💖"
+        elif score >= 70:
+            comment = "🌸 super cute cosmic besties & partners! 🥰"
+        elif score >= 40:
+            comment = "💫 starry vibes, good chemistry! 😊"
+        elif score >= 20:
+            comment = "🌙 cute friendly space travel buds! 🛸"
         else:
-            comment = "Opposites attract... maybe? 💔"
+            comment = "🪐 drifting in different orbits... but still cute! 🤍"
 
-        filled = int(ship_score / 10)
-        bar = "💖" * filled + "🖤" * (10 - filled)
+        # Luodaan galaktinen ja söpö kortti
+        width, height = 600, 240
+        image = Image.new("RGBA", (width, height), (25, 15, 35, 255)) # Galaxy dark purple
+        draw = ImageDraw.Draw(image)
 
-        embed = discord.Embed(
-            title="💞 Compatibility Love Meter",
-            description=(
-                f"**{user1.mention}** x **{user2.mention}**\n\n"
-                f"**Score:** {ship_score}%\n"
-                f"[{bar}]\n"
-                f"**Away from 100%:** {missing_score}%\n\n"
-                f"*{comment}*"
-            ),
-            color=discord.Color.from_rgb(255, 190, 210)
-        )
-        embed.set_footer(text="Moonlings Ship System 🌸")
-        await ctx.send(embed=embed)
+        # Piirretään satunnaisia pieniä "tähtiä" taivaalle (galactic dust)
+        for _ in range(35):
+            rx = random.randint(10, width - 10)
+            ry = random.randint(10, height - 10)
+            draw.point((rx, ry), fill=(255, 240, 250, random.randint(100, 220)))
+
+        # Söpö pastellinen reuna
+        draw.rounded_rectangle([10, 10, width-10, height-10], radius=18, outline=(255, 180, 220), width=3)
+
+        async def fetch_avatar(user):
+            url = user.display_avatar.with_size(128).url
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    if resp.status == 200:
+                        data = await resp.read()
+                        return Image.open(io.BytesIO(data)).convert("RGBA")
+            return Image.new("RGBA", (100, 100), (150, 150, 150, 255))
+
+        av1 = await fetch_avatar(user1)
+        av2 = await fetch_avatar(user2)
+
+        def make_circle_avatar(av):
+            av = av.resize((90, 90))
+            mask = Image.new("L", (90, 90), 0)
+            ImageDraw.Draw(mask).ellipse((0, 0, 90, 90), fill=255)
+            
+            output = Image.new("RGBA", (90, 90), (0, 0, 0, 0))
+            output.paste(av, (0, 0), mask=mask)
+            
+            # Söpö vaaleanpunainen reunus avatarille
+            ring = Image.new("RGBA", (98, 98), (0, 0, 0, 0))
+            ImageDraw.Draw(ring).ellipse((0, 0, 98, 98), fill=(255, 160, 200, 255))
+            ring.paste(output, (4, 4), mask=output)
+            return ring
+
+        circle1 = make_circle_avatar(av1)
+        circle2 = make_circle_avatar(av2)
+
+        image.paste(circle1, (50, 55), circle1)
+        image.paste(circle2, (452, 55), circle2)
+
+        # Sydän keskelle prosentilla
+        draw.ellipse((260, 55, 340, 125), fill=(255, 110, 160, 255))
+        draw.text((285, 82), f"{score}%", fill=(255, 255, 255, 255))
+
+        # Latauspalkki (pastelli vaaleanpunainen)
+        bx1, by1, bx2, by2 = 175, 150, 425, 166
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=8, fill=(45, 30, 55, 255))
+        fill_w = int((bx2 - bx1) * (score / 100))
+        if fill_w > 0:
+            draw.rounded_rectangle([bx1, by1, bx1 + fill_w, by2], radius=8, fill=(255, 150, 200, 255))
+
+        # Nimet, galaktinen teema ja puuttuvat prosentit
+        draw.text((170, 25), f"🌌 [ {user1.name} + {user2.name} ] 🪐", fill=(255, 220, 240, 255))
+        draw.text((170, 185), f"{comment}", fill=(230, 200, 220, 255))
+        draw.text((195, 210), f"✨ Missing to 100%: {missing}% ✨", fill=(180, 160, 200, 255))
+
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        file = discord.File(buffer, filename="galaxy_ship.png")
+        await ctx.send(file=file)
 
 async def setup(bot):
     await bot.add_cog(StarFamily(bot))
