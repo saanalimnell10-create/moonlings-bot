@@ -26,7 +26,6 @@ def ensure_user(data, user_id):
             "parents": []
         }
 
-# Napit kosintaa varten
 class ProposalView(discord.ui.View):
     def __init__(self, proposer: discord.Member, target: discord.Member):
         super().__init__(timeout=120)
@@ -36,7 +35,7 @@ class ProposalView(discord.ui.View):
     @discord.ui.button(label="Accept 💖", style=discord.ButtonStyle.success)
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.target.id:
-            await interaction.response.send_message("🌸 Tämä kosinta ei ole sinulle!", ephemeral=True)
+            await interaction.response.send_message("🌸 This proposal is not for you!", ephemeral=True)
             return
 
         data = load_data()
@@ -56,9 +55,8 @@ class ProposalView(discord.ui.View):
         for item in self.children:
             item.disabled = True
 
-        # Lähetetään tavallinen tekstiviesti Embedin sijaan!
         await interaction.response.edit_message(
-            content=f"💍 **OOH!** {self.target.mention} hyväksyi käyttäjän {self.proposer.mention} kosinnan! Onnea uudelle avioparille! 🎉💖🌸",
+            content=f"💍 **OOH!** {self.target.mention} accepted {self.proposer.mention}'s proposal! Congratulations to the happy couple! 🎉💖🌸",
             embed=None,
             view=self
         )
@@ -66,14 +64,14 @@ class ProposalView(discord.ui.View):
     @discord.ui.button(label="Decline 💔", style=discord.ButtonStyle.danger)
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.target.id:
-            await interaction.response.send_message("🌸 Tämä kosinta ei ole sinulle!", ephemeral=True)
+            await interaction.response.send_message("🌸 This proposal is not for you!", ephemeral=True)
             return
 
         for item in self.children:
             item.disabled = True
 
         await interaction.response.edit_message(
-            content=f"💔 {self.target.mention} kieltäytyi käyttäjän {self.proposer.mention} kosinnasta...",
+            content=f"💔 {self.target.mention} declined {self.proposer.mention}'s proposal...",
             embed=None,
             view=self
         )
@@ -86,10 +84,10 @@ class StarFamily(commands.Cog):
     async def propose(self, ctx, member: discord.Member):
         """Proposes to a member with interactive buttons."""
         if member == ctx.author:
-            await ctx.send("🌸 Et voi kosia itseäsi!")
+            await ctx.send("🌸 You cannot propose to yourself!")
             return
         if member.bot:
-            await ctx.send("🌸 Et voi kosia bottia!")
+            await ctx.send("🌸 You cannot propose to a bot!")
             return
 
         data = load_data()
@@ -97,12 +95,12 @@ class StarFamily(commands.Cog):
         t_id = str(member.id)
 
         if p_id in data and t_id in data[p_id].get("spouses", []):
-            await ctx.send(f"🌸 Olet jo naimisissa käyttäjän {member.mention} kanssa!")
+            await ctx.send(f"🌸 You are already married to {member.mention}!")
             return
 
         view = ProposalView(ctx.author, member)
         await ctx.send(
-            f"💍 {member.mention}, käyttäjä **{ctx.author.mention}** on kosinut sinua! 🌸 Hyväksytkö?",
+            f"💍 {member.mention}, **{ctx.author.mention}** has proposed to you! 🌸 Do you accept?",
             view=view
         )
 
@@ -110,10 +108,10 @@ class StarFamily(commands.Cog):
     async def adopt(self, ctx, member: discord.Member):
         """Adopts another member into your star family as a child."""
         if member == ctx.author:
-            await ctx.send("🌸 Et voi adoptoida itseäsi!")
+            await ctx.send("🌸 You cannot adopt yourself!")
             return
         if member.bot:
-            await ctx.send("🌸 Et voi adoptoida bottia!")
+            await ctx.send("🌸 You cannot adopt a bot!")
             return
 
         data = load_data()
@@ -124,7 +122,7 @@ class StarFamily(commands.Cog):
         ensure_user(data, c_id)
 
         if c_id in data[p_id]["children"]:
-            await ctx.send(f"🌸 {member.mention} on jo lapsesi!")
+            await ctx.send(f"🌸 {member.mention} is already your child!")
             return
 
         data[p_id]["children"].append(c_id)
@@ -132,7 +130,7 @@ class StarFamily(commands.Cog):
             data[c_id]["parents"].append(p_id)
 
         save_data(data)
-        await ctx.send(f"👶 🎉 **{ctx.author.mention}** adoptoi käyttäjän **{member.mention}** tähtiperheeseensä! 🌸✨")
+        await ctx.send(f"👶 🎉 **{ctx.author.mention}** has adopted **{member.mention}** into their star family! 🌸✨")
 
     @commands.command(name="divorce")
     async def divorce(self, ctx, member: discord.Member):
@@ -142,7 +140,7 @@ class StarFamily(commands.Cog):
         t_id = str(member.id)
 
         if p_id not in data or t_id not in data[p_id].get("spouses", []):
-            await ctx.send(f"🌸 Et ole naimisissa käyttäjän {member.mention} kanssa.")
+            await ctx.send(f"🌸 You are not married to {member.mention}.")
             return
 
         data[p_id]["spouses"].remove(t_id)
@@ -150,7 +148,7 @@ class StarFamily(commands.Cog):
             data[t_id]["spouses"].remove(p_id)
 
         save_data(data)
-        await ctx.send(f"💔 **{ctx.author.mention}** ja **{member.mention}** ovat eronneet sovussa. ✨")
+        await ctx.send(f"💔 **{ctx.author.mention}** and **{member.mention}** have amicably divorced. ✨")
 
     @commands.command(name="family")
     async def family(self, ctx, member: discord.Member = None):
@@ -187,15 +185,15 @@ class StarFamily(commands.Cog):
         ship_score = (user1.id + user2.id) % 101
 
         if ship_score >= 90:
-            comment = "Täydellinen pari! Sielunkumppanit! 💞✨"
+            comment = "A perfect match! Soulmates! 💞✨"
         elif ship_score >= 70:
-            comment = "Todella söpö pari yhdessä! 🥰🌸"
+            comment = "A really cute couple together! 🥰🌸"
         elif ship_score >= 40:
-            comment = "Hyvät mahdollisuudet, kemiaa löytyy! 😊"
+            comment = "Good chances, chemistry found! 😊"
         elif ship_score >= 20:
-            comment = "Ehkä kavereina parempia? 😅"
+            comment = "Maybe better as friends? 😅"
         else:
-            comment = "Vastakohdat täydentävät toisiaan... ehkä? 💔"
+            comment = "Opposites attract... maybe? 💔"
 
         filled = int(ship_score / 10)
         bar = "💖" * filled + "🖤" * (10 - filled)
