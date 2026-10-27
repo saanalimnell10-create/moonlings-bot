@@ -11,6 +11,7 @@ class HelpSelect(discord.ui.Select):
             discord.SelectOption(label="Threat Security", description="Dynamic pressure tracking, toggles, and modes", emoji="🚨"),
             discord.SelectOption(label="Security & Anti-Nuke", description="Anti-nuke, anti-raid, and whitelist settings", emoji="🔒"),
             discord.SelectOption(label="Fake Permissions", description="Custom role-based permissions setup", emoji="🔑"),
+            discord.SelectOption(label="Giveaways", description="Advanced giveaways with tickets & auto-rerolls", emoji="🎁"),
             discord.SelectOption(label="Audit Logs", description="Configure server event logging", emoji="📜"),
             discord.SelectOption(label="Server Tools", description="Emoji steal and channel cloning tools", emoji="🧰"),
             discord.SelectOption(label="Staff Applications", description="Staff apply panel and application controls", emoji="🌸"),
@@ -109,6 +110,22 @@ class HelpSelect(discord.ui.Select):
                     f"`{p}removeperm [@role] [perm]` - Removes custom permission from a role.\n"
                     f"`{p}listperms` - Lists custom role permission settings.\n"
                     f"`{p}resetperms` - Resets all fake permission settings."
+                ),
+                inline=False
+            )
+
+        elif selected == "Giveaways":
+            embed.title = "🎁 Giveaway Center"
+            embed.description = "Advanced giveaways with tickets, auto-rerolls, and voucher closing."
+            embed.add_field(
+                name="📜 Commands",
+                value=(
+                    f"`/giveaway create` - Create an advanced giveaway with custom options[cite: 1, 2, 3]\n"
+                    f"`/giveaway end` - End an active giveaway early using message ID[cite: 3]\n"
+                    f"`/giveaway delete` - Delete a giveaway message[cite: 3]\n"
+                    f"`/giveaway fix` - Force-fix or clear a stuck giveaway state[cite: 4]\n"
+                    f"`/giveaway participants` - View all users who have participated[cite: 4]\n"
+                    f"• *Features:* Claim time, max rerolls, auto-ticket creation, and vouch-to-close!"
                 ),
                 inline=False
             )
