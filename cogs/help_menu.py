@@ -120,11 +120,11 @@ class HelpSelect(discord.ui.Select):
             embed.add_field(
                 name="📜 Commands",
                 value=(
-                    f"`/giveaway create` - Create an advanced giveaway with custom options[cite: 1, 2, 3]\n"
-                    f"`/giveaway end` - End an active giveaway early using message ID[cite: 3]\n"
-                    f"`/giveaway delete` - Delete a giveaway message[cite: 3]\n"
-                    f"`/giveaway fix` - Force-fix or clear a stuck giveaway state[cite: 4]\n"
-                    f"`/giveaway participants` - View all users who have participated[cite: 4]\n"
+                    f"`{p}giveaway create` - Create an advanced giveaway with custom options\n"
+                    f"`{p}giveaway end` - End an active giveaway early using message ID\n"
+                    f"`{p}giveaway delete` - Delete a giveaway message\n"
+                    f"`{p}giveaway fix` - Force-fix or clear a stuck giveaway state\n"
+                    f"`{p}giveaway participants` - View all users who have participated\n"
                     f"• *Features:* Claim time, max rerolls, auto-ticket creation, and vouch-to-close!"
                 ),
                 inline=False
